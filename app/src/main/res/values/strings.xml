@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Ответственный гражданин</string>
+    <string name="signin">Войти</string>
+    <string-array name="listofsp">
+        <item>Барсик</item>
+        <item>Мурзик</item>
+        <item>Васька</item>
+        <item>Рыжик</item>
+    </string-array>
+</resources>

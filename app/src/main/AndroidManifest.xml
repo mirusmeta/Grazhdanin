@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.MyApplication"
+        tools:targetApi="31">
+        <activity
+            android:name=".RaitingAdmin"
+            android:exported="false" />
+        <activity
+            android:name=".UserAbout"
+            android:exported="false" />
+
+        <service
+            android:name=".Userchecking"
+            android:enabled="true"
+            android:exported="true" />
+
+        <receiver android:name=".ReceiverUser" />
+
+        <activity
+            android:name=".changingpassword"
+            android:exported="false" />
+        <activity
+            android:name=".changing"
+            android:exported="false" />
+        <activity
+            android:name=".proverka"
+            android:exported="false" />
+        <activity
+            android:name=".raiting"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyC59Y9faCSp54J5HPlHoU1cTRM7NGH_YWw" />
+
+        <activity
+            android:name=".writeareport"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".helloactivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".register"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".vhod"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AdminMainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".AuthChooserActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".splashscreen"
+            android:exported="true"
+            android:screenOrientation="portrait">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:screenOrientation="portrait" />
+    </application>
+
+</manifest>
