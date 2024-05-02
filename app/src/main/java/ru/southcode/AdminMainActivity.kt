@@ -361,7 +361,9 @@ class AdminMainActivity : AppCompatActivity() {
             snapshot?.let { documents ->
                 val reportsList = mutableListOf<CustomModel>()
                 val updatedMarkers = mutableSetOf<String>()
+                val x = lazy {
 
+                }
                 for (document in documents) {
                     val lat = document.getDouble("wherelat") ?: 0.0
                     val lon = document.getDouble("wherelon") ?: 0.0
