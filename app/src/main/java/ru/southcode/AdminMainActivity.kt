@@ -1,5 +1,6 @@
 package ru.southcode
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
@@ -46,6 +47,7 @@ class AdminMainActivity : AppCompatActivity() {
     private lateinit var polygon: List<LatLng>
     lateinit var mapFragment: SupportMapFragment
 
+    @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_admin_main)
@@ -74,7 +76,6 @@ class AdminMainActivity : AppCompatActivity() {
         var email: TextView = findViewById(R.id.email)
         var password: TextView = findViewById(R.id.password)
         var kolvoall: TextView = findViewById(R.id.kolvoall)
-        var refactor: TextView = findViewById(R.id.izmenit)
         var logout: TextView = findViewById(R.id.signout)
         var support: ConstraintLayout = findViewById(R.id.support)
         var db2 = Firebase.firestore
@@ -361,9 +362,6 @@ class AdminMainActivity : AppCompatActivity() {
             snapshot?.let { documents ->
                 val reportsList = mutableListOf<CustomModel>()
                 val updatedMarkers = mutableSetOf<String>()
-                val x = lazy {
-
-                }
                 for (document in documents) {
                     val lat = document.getDouble("wherelat") ?: 0.0
                     val lon = document.getDouble("wherelon") ?: 0.0

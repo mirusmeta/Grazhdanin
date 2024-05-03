@@ -1,5 +1,7 @@
 package ru.southcode
 
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -11,7 +13,9 @@ import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.bumptech.glide.Glide
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
@@ -22,36 +26,37 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.firestore.ktx.getField
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
+import com.squareup.picasso.Target
 import kotlin.math.floor
 
 class raiting : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_raiting)
+        enableEdgeToEdge()
         Log.d("20241", "Переход в activity оценивания")
-        var statusot:TextView = findViewById(R.id.statusot)
-        var likes:TextView = findViewById(R.id.likes)
-        var views:TextView = findViewById(R.id.views)
-        var category:TextView = findViewById(R.id.category)
-        var name:TextView = findViewById(R.id.name)
-        var img:ImageView = findViewById(R.id.imagev)
-        var textView3:TextView = findViewById(R.id.textView3)
-        var id = intent.getStringExtra("id")
-        var db = Firebase.firestore
+        val statusot:TextView = findViewById(R.id.statusot)
+        val likes:TextView = findViewById(R.id.likes)
+        val views:TextView = findViewById(R.id.views)
+        val category:TextView = findViewById(R.id.category)
+        val name:TextView = findViewById(R.id.name)
+        val textView3:TextView = findViewById(R.id.textView3)
+        val id = intent.getStringExtra("id")
+        val db = Firebase.firestore
         var lat = 0.0
         var lon = 0.0
         var olrait = 0.0
         var kv = 1
-        var ochen:Button = findViewById(R.id.ochen)
+        val ochen:Button = findViewById(R.id.ochen)
         ochen.isEnabled = false
-        var ratingBar:RatingBar = findViewById(R.id.ratingBar)
+        val ratingBar:RatingBar = findViewById(R.id.ratingBar)
         ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
             Log.d("20241", "Изменена оценка: ${rating} из 5.0")
             ochen.isEnabled = true
         }
         //Проверка у пользователя
-        var sp = getSharedPreferences("memory", MODE_PRIVATE)
-        var likes1 = sp.getString("votes", "dontgotten").toString()
+        val sp = getSharedPreferences("memory", MODE_PRIVATE)
+        val likes1 = sp.getString("votes", "dontgotten").toString()
         if(likes1 != "dontgotten"){
             if(likes1.contains(id.toString())){
                 ochen.visibility = View.INVISIBLE
@@ -66,7 +71,7 @@ class raiting : AppCompatActivity() {
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference.child("images/${it.getString("image")}")
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                Picasso.get().load(uri).into(img)
+                loadImageWithRoundedCorners(uri.toString())
             }.addOnFailureListener { exception ->
                 Log.e("20241", "Картинка не загружена из бд: ${exception.message}")
             }
@@ -77,7 +82,7 @@ class raiting : AppCompatActivity() {
             views.text = it.getLong("views").toString()
             likes.text = it.getDouble("liked").toString()
             kv += it.getLong("views")!!.toInt()
-            var st = it.getString("status")
+            val st = it.getString("status")
             when(st){
                 "created" -> statusot.text = "Создано"
                 "viewed" -> statusot.text = "Просмотрено"
@@ -105,7 +110,7 @@ class raiting : AppCompatActivity() {
         }.addOnFailureListener {
             Log.e("20241", "Данные с бд не получены")
         }
-        var h = Handler()
+        val h = Handler()
         h.postDelayed({
             val mapFragment = SupportMapFragment.newInstance()
             val fragmentTransaction = supportFragmentManager.beginTransaction()
@@ -149,4 +154,19 @@ class raiting : AppCompatActivity() {
 
         }
     }
+    private fun loadImageWithRoundedCorners(url: String) {
+        Picasso.get().load(url)
+            .into(object : Target {
+                override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
+                    val roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
+                    roundedBitmapDrawable.cornerRadius = 28f
+                    findViewById<ImageView>(R.id.imagev).setImageDrawable(roundedBitmapDrawable)
+                }
+
+                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
+
+                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
+            })
+    }
+
 }

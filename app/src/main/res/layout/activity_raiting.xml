@@ -4,25 +4,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/white"
     tools:context=".raiting">
 
-    <androidx.cardview.widget.CardView
-        android:layout_marginTop="20dp"
+    <ImageView
+        android:layout_marginTop="50dp"
         android:layout_marginEnd="20dp"
-        android:id="@+id/cardView"
+        android:id="@+id/imagev"
         android:layout_width="120dp"
         android:layout_height="90dp"
         app:cardCornerRadius="10dp"
         app:cardElevation="4dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <ImageView
-            android:id="@+id/imagev"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:src="@drawable/img"/>
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout5"
@@ -31,7 +25,7 @@
         android:layout_marginTop="10dp"
         android:layout_marginEnd="20dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cardView">
+        app:layout_constraintTop_toBottomOf="@id/imagev">
 
         <TextView
             android:id="@+id/views"
@@ -78,7 +72,7 @@
 
 
     <TextView
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
         android:id="@+id/name"
         android:layout_width="240dp"
         android:layout_height="wrap_content"
@@ -121,7 +115,7 @@
         android:textColor="#707070"
         android:textSize="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/cardView" />
+        app:layout_constraintTop_toBottomOf="@+id/imagev" />
 
     <androidx.cardview.widget.CardView
         app:layout_constraintTop_toBottomOf="@id/textView3"
