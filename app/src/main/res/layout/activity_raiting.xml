@@ -8,7 +8,7 @@
     tools:context=".raiting">
 
     <ImageView
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="46dp"
         android:layout_marginEnd="20dp"
         android:id="@+id/imagev"
         android:layout_width="120dp"
@@ -72,7 +72,7 @@
 
 
     <TextView
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="46dp"
         android:id="@+id/name"
         android:layout_width="240dp"
         android:layout_height="wrap_content"

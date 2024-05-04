@@ -12,6 +12,7 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.core.widget.addTextChangedListener
@@ -32,7 +33,7 @@ class RaitingAdmin : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_raiting_admin)
-
+        enableEdgeToEdge()
         dropdownMenu = findViewById(R.id.dropdown_menu)
         val likes: TextView = findViewById(R.id.likes)
         val views: TextView = findViewById(R.id.views)
