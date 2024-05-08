@@ -71,6 +71,7 @@ class MainActivity : AppCompatActivity() {
         var carddeskription:TextView = findViewById(R.id.carddeskription)
         var status:TextView = findViewById(R.id.status)
         val sharedPreferences = getSharedPreferences("memory", Context.MODE_PRIVATE)
+        val faq:ConstraintLayout = findViewById(R.id.faq)
         closeicon.setOnClickListener {
             val yDelta = 500f  // Расстояние, на которое элемент сместится вниз
             val duration = 480L  // Длительность анимации в миллисекундах
@@ -267,6 +268,16 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this@MainActivity, "Ошибка!", Toast.LENGTH_LONG).show()
             }
         }
+        faq.setOnClickListener {
+            openFAQquestions()
+        }
+    }
+
+    private fun openFAQquestions() {
+        val url = "https://xn--80aaeafhdblwf1cagbb6blqcb6r.xn--p1ai/%d1%87%d0%b0%d1%81%d1%82%d0%be-%d0%b7%d0%b0%d0%b4%d0%b0%d0%b2%d0%b0%d0%b5%d0%bc%d1%8b%d0%b5-%d0%b2%d0%be%d0%bf%d1%80%d0%be%d1%81%d1%8b/"
+        val intent = Intent(Intent.ACTION_VIEW)
+        intent.data = Uri.parse(url)
+        startActivity(intent)
     }
 
     private fun myupdatebase() {
