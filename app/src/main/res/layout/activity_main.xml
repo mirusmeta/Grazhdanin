@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
+    android:id="@+id/back"
     tools:context=".MainActivity">
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
@@ -245,45 +246,35 @@
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/pd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Персональные данные"
             android:textColor="@color/purple_200"
             android:textSize="17dp"
             android:layout_marginTop="100dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="32dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/izmenit"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="100dp"
-            android:layout_marginEnd="20dp"
-            android:text="Изменить"
-            android:textColor="@color/btn"
-            android:textSize="15dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_constraintTop_toBottomOf="@id/pd"
+            android:layout_marginTop="16dp"
             android:id="@+id/constraintLayout3"
             android:layout_width="match_parent"
-            android:layout_height="170dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="26dp"
-            android:layout_marginEnd="20dp"
+            android:layout_height="130dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
             android:background="@drawable/constrolprof"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/izmenit">
+            tools:layout_editor_absoluteY="146dp">
 
             <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="100dp"
-                android:layout_height="100dp"
-                android:layout_marginStart="20dp"
+                android:id="@+id/profileImage"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_marginStart="28dp"
                 android:src="@drawable/whiteprofile"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -291,10 +282,10 @@
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="200dp"
-                android:layout_height="140dp"
-                android:layout_marginStart="16dp"
+                android:layout_height="100dp"
+                android:layout_marginStart="26dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView2"
+                app:layout_constraintStart_toEndOf="@+id/profileImage"
                 app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
@@ -315,7 +306,7 @@
                     android:text="{example@email.com}"
                     android:textColor="@color/white"
                     android:textSize="14dp"
-                    app:layout_constraintBottom_toTopOf="@id/password"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/surandname" />
 
@@ -333,51 +324,26 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/constraintLayout4"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="18sp"
-            android:layout_marginEnd="20dp"
-            android:background="@drawable/constrolprof"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3">
-
-
-            <TextView
-                android:id="@+id/kolvoall"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginBottom="5dp"
-                android:text=""
-                android:textColor="@color/white"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:id="@+id/signout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="32dp"
             android:text="Выход из аккаунта"
             android:textColor="#FF4646"
             android:textSize="13dp"
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/constraintLayout4" />
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout3" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/faq"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="18dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="32dp"
             android:background="@drawable/constrolprof"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -404,9 +370,9 @@
             android:id="@+id/support"
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="32dp"
             android:layout_marginTop="18dp"
-            android:layout_marginEnd="20dp"
+            android:layout_marginEnd="32dp"
             android:background="@drawable/constrolprof"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

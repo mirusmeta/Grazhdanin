@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import com.squareup.picasso.Target
 import android.graphics.Bitmap

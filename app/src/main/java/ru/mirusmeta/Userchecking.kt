@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.app.AlarmManager
 import android.app.PendingIntent
@@ -7,10 +7,6 @@ import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import android.os.SystemClock
-import android.util.Log
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.firestore
 
 class Userchecking : Service() {
 

@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -13,10 +13,8 @@ import android.view.View
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.TranslateAnimation
 import android.widget.ImageView
-import android.widget.SearchView
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager

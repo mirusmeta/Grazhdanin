@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.content.Context
 import android.content.Intent
@@ -12,9 +12,7 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.widget.addTextChangedListener
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 

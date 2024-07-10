@@ -5,17 +5,24 @@ plugins {
 }
 
 android {
-    namespace = "ru.southcode"
+    namespace = "ru.mirusmeta"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.southcode"
+        applicationId = "ru.mirusmeta"
         minSdk = 25
         targetSdk = 33
         versionCode = 1
         versionName = "1.1.2-beta"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        addManifestPlaceholders(mapOf(
+            "VKIDRedirectHost" to "vk.com", // Обычно vk.com.
+            "VKIDRedirectScheme" to "vk51987085", // Строго в формате vk{ID приложения}.
+            "VKIDClientID" to "51987085",
+            "VKIDClientSecret" to "r3i2KZZYQ3rZJmFnD3Ry"
+        ))
     }
 
     buildTypes {
@@ -30,6 +37,9 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+
+        isCoreLibraryDesugaringEnabled = true
+
     }
     kotlinOptions {
         jvmTarget = "1.8"
@@ -40,6 +50,9 @@ android {
 }
 
 dependencies {
+    implementation("com.vk.id:onetap-xml:2.0.0")
+
+    implementation("com.vk.id:vkid:2.0.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.squareup.picasso:picasso:2.71828")
     implementation("androidx.core:core-ktx:1.13.1")
@@ -53,4 +66,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
+
 }

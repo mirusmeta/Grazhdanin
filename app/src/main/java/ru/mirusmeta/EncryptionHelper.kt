@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.util.Base64
 import javax.crypto.Cipher

@@ -3,9 +3,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
+    android:id="@+id/back"
     android:layout_height="match_parent"
     android:background="@color/white"
     tools:context=".AuthChooserActivity">
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout2"
@@ -16,6 +18,20 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
+        <com.vk.id.onetap.xml.OneTap
+            android:id="@+id/oneTap"
+            android:layout_marginStart="38dp"
+            android:layout_marginEnd="38dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:vkid_buttonsCornerRadius="18dp"
+            app:vkid_onetapShowSignInToAnotherAccount="true"
+            app:vkid_onetapFastAuthEnabled="true"
+            app:vkid_onetapScopes="phone,email"/>
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="120dp"
@@ -42,10 +58,8 @@
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/button"
             android:layout_width="match_parent"
-            android:layout_height="70dp"
+            android:layout_height="50dp"
             android:layout_marginStart="38dp"
-            android:layout_marginEnd="38dp"
-            android:layout_marginBottom="40dp"
             android:background="@drawable/styleofbuttonsignin"
             android:enabled="false"
             android:fontFamily="sans-serif"
@@ -54,9 +68,9 @@
             android:textColor="@color/white"
             android:textSize="20dp"
             android:textStyle="normal"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            android:visibility="invisible"
+            app:layout_constraintStart_toStartOf="parent"
+             />
 
         <TextView
             android:layout_marginTop="20dp"
@@ -71,6 +85,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
         <EditText
+            android:visibility="invisible"
             android:id="@+id/emailtext"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -90,11 +105,11 @@
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/constraintLayout"
             android:layout_width="match_parent"
-            android:layout_height="30dp"
+            android:layout_height="40dp"
             android:layout_marginStart="38dp"
             android:layout_marginEnd="38dp"
             android:layout_marginBottom="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/button"
+            app:layout_constraintBottom_toTopOf="@+id/oneTap"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
 
@@ -103,23 +118,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:gravity="center"
                 android:layout_marginBottom="2dp"
                 android:fontFamily="sans-serif"
-                android:text="Я принимаю политику конфидициальности"
+                android:text="Нажимая продолжить я принимаю \nполитику конфидициальности"
                 android:textColor="#A8A5A8"
                 android:textSize="14dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/roundedCheckBox"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <CheckBox
-                android:id="@+id/roundedCheckBox"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="4dp"
-                android:background="@drawable/checkbox"
-                android:button="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>

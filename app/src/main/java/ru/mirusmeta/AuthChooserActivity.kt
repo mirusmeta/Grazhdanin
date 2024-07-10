@@ -1,11 +1,11 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.content.Intent
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.os.Handler
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CheckBox
@@ -13,8 +13,14 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
+import com.vk.id.AccessToken
+import com.vk.id.VKID
+import com.vk.id.VKIDAuthFail
+import com.vk.id.auth.VKIDAuthCallback
+import com.vk.id.onetap.xml.OneTap
 
 class AuthChooserActivity : AppCompatActivity() {
     companion object {
@@ -24,7 +30,28 @@ class AuthChooserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_auth_chooser)
-        val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
+
+        //ВК Авторизаиця
+        var oneTap:OneTap = findViewById(R.id.oneTap)
+        oneTap.setCallbacks(onAuth = {oAuth, accessToken ->
+            goToHello()
+        }, onFail = {oAuth, fail ->
+            when(fail){
+                is VKIDAuthFail.Canceled -> {
+                    Snackbar.make(findViewById(R.id.back), "Авторизация отклонена!", Snackbar.LENGTH_LONG).show()
+                }
+                is VKIDAuthFail.NoBrowserAvailable -> {
+                    Snackbar.make(findViewById(R.id.back), "Отсутствует бразер!", Snackbar.LENGTH_LONG).show()
+                }
+
+                else -> {
+                    Snackbar.make(findViewById(R.id.back), "Ошибка. Попробуйте ещё раз!", Snackbar.LENGTH_LONG).show()
+                }
+            }
+        })
+
+
+        /*val progress_bar: ProgressBar = findViewById(R.id.progress_bar)
         val emailtext:TextView = findViewById(R.id.emailtext)
         val constraintLayout:ConstraintLayout = findViewById(R.id.constraintLayout)
         val timer:TextView = findViewById(R.id.timer)
@@ -38,7 +65,7 @@ class AuthChooserActivity : AppCompatActivity() {
             startActivity(intent)
         }
         var fortimer = intent.getStringExtra("time").toString()
-        if(fortimer == "turnOnTheTimer982/9*/523A222"){//Чтобы точно такого значения небыло
+        if(fortimer == "turnOnTheTimer982/9/523A222"){//Чтобы точно такого значения небыло
             val tenMinutesInMillis: Long = 10 * 60 * 1000 // 10 минут в миллисекундах
             val timertime = object : CountDownTimer(tenMinutesInMillis, 1000) {
                 override fun onTick(millisUntilFinished: Long) {
@@ -66,15 +93,6 @@ class AuthChooserActivity : AppCompatActivity() {
             val encryptionHelper = EncryptionHelper(KEY)
             var db = Firebase.firestore
             var button:Button = findViewById(R.id.button)
-            var roundedCheckBox:CheckBox = findViewById(R.id.roundedCheckBox)
-            roundedCheckBox.setOnCheckedChangeListener { buttonView, isChecked ->
-                if (isChecked && emailtext.text.contains('@')){
-                    button.isEnabled = true
-                }
-                else if(!isChecked || !emailtext.text.contains('@')){
-                    button.isEnabled = false
-                }
-            }
             button.setOnClickListener {
                 if (it.isEnabled){
                     progress_bar.visibility = View.VISIBLE
@@ -110,8 +128,17 @@ class AuthChooserActivity : AppCompatActivity() {
                 }
             }
         }
-
+        */
     }
+
+    private fun goToHello() {
+        Log.d("20241", "Переходим к приветственному экрану")
+        val intent = Intent(this, helloactivity::class.java)
+        startActivity(intent)
+        overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
+        finish()
+    }
+
     override fun onBackPressed() {
         //Ставим параметр ничего не делать
     }

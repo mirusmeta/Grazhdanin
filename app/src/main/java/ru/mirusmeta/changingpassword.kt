@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity

@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import org.junit.Test
 

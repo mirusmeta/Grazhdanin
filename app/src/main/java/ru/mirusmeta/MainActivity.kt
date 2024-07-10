@@ -1,6 +1,5 @@
-package ru.southcode
+package ru.mirusmeta
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
@@ -8,18 +7,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
-import android.view.MenuItem
 import android.view.View
 
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.TranslateAnimation
-import android.widget.Button
 import android.widget.ImageView
-import android.widget.ListView
-import android.widget.RatingBar
 import android.widget.TextView
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
@@ -36,76 +30,101 @@ import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
-import java.sql.DriverManager
-import java.sql.SQLException
-import kotlin.io.path.Path
+import com.vk.id.VKID
+import com.vk.id.logout.VKIDLogoutCallback
+import com.vk.id.logout.VKIDLogoutFail
 
 class MainActivity : AppCompatActivity() {
     companion object {
         @JvmStatic
         var ID = ""
     }
+
     private lateinit var mMap: GoogleMap
-    private var category: Int = 0
     private lateinit var rostovPolygon: Polygon
     private lateinit var polygon: List<LatLng>
     lateinit var mapFragment: SupportMapFragment
+    private var h = Handler()
+    private var db:FirebaseFirestore? = null
+
+    //ФИО и Телефон
+    private val nameOfUser by lazy { "Имя пользователя: ${VKID.instance.accessToken?.userData?.firstName} ${VKID.instance.accessToken?.userData?.lastName}" }
+    private val phoneOfUser by lazy { "Телефон: +${VKID.instance.accessToken?.userData?.phone}" }
+
+
+    //Разметка объявление
+    private val constrofcard by lazy { findViewById<ConstraintLayout>(R.id.constrofcard) }
+    private val closeicon by lazy { findViewById<ImageView>(R.id.closeicon) }
+    private val nameofbrash by lazy { findViewById<TextView>(R.id.nameofbrash) }
+    private val cardcategory by lazy { findViewById<TextView>(R.id.cardcategory) }
+    private val views by lazy { findViewById<TextView>(R.id.views) }
+    private val likes by lazy { findViewById<TextView>(R.id.likes) }
+    private val carddeskription by lazy { findViewById<TextView>(R.id.carddeskription) }
+    private val status by lazy { findViewById<TextView>(R.id.status) }
+    private val imgoftask by lazy { findViewById<ImageView>(R.id.imgoftask) }
+    private val faq by lazy { findViewById<ConstraintLayout>(R.id.faq) }
+
+    // Разметка действия с профилем
+    private val imageProfile by lazy { VKID.instance.accessToken?.userData?.photo200 }
+    private val profileImage by lazy { findViewById<ImageView>(R.id.profileImage) }
+    private val surandname by lazy { findViewById<TextView>(R.id.surandname) }
+    private val phone by lazy { findViewById<TextView>(R.id.email) }
+    private val logout by lazy { findViewById<TextView>(R.id.signout) }
+    private val support by lazy { findViewById<ConstraintLayout>(R.id.support) }
+    private val add by lazy { findViewById<TextView>(R.id.add) }
+
+    // Меню переключений
+    private val textviewall by lazy { findViewById<TextView>(R.id.textviewall) }
+    private val homepage by lazy { findViewById<ConstraintLayout>(R.id.homepage) }
+    private val mappage by lazy { findViewById<ConstraintLayout>(R.id.mappage) }
+    private val profilepage by lazy { findViewById<ConstraintLayout>(R.id.profilepage) }
+    private val bottom_navigation by lazy { findViewById<BottomNavigationView>(R.id.bottom_navigation) }
+    private val chip1 by lazy { findViewById<Chip>(R.id.chip1) }
+    private val chip2 by lazy { findViewById<Chip>(R.id.chip2) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.d("20241", "Запуск MainActivity")
-        var h = Handler()
-        var constrofcard:ConstraintLayout = findViewById(R.id.constrofcard)
-        var closeicon:ImageView = findViewById(R.id.closeicon)
-        var nameofbrash:TextView = findViewById(R.id.nameofbrash)
-        var cardcategory:TextView = findViewById(R.id.cardcategory)
-        var views:TextView = findViewById(R.id.views)
-        var likes:TextView = findViewById(R.id.likes)
-        var carddeskription:TextView = findViewById(R.id.carddeskription)
-        var status:TextView = findViewById(R.id.status)
-        val sharedPreferences = getSharedPreferences("memory", Context.MODE_PRIVATE)
-        val faq:ConstraintLayout = findViewById(R.id.faq)
-        closeicon.setOnClickListener {
-            val yDelta = 500f  // Расстояние, на которое элемент сместится вниз
-            val duration = 480L  // Длительность анимации в миллисекундах
-            val animation = TranslateAnimation(0f, 0f, 0f, yDelta)
-            animation.duration = duration
-            animation.interpolator = AccelerateInterpolator()
-            constrofcard.startAnimation(animation)
-            h.postDelayed({constrofcard.visibility = View.INVISIBLE},490)
+
+        db = Firebase.firestore
+
+        runBottomMenu()//Нижнее меню
+        closeicon?.setOnClickListener { closeFromPred() }//Закрытие вспомогательной карточки
+
+        //Инициализации
+        initializeMap()
+        initializeProfile()
+        dbUpdates()
+
+        //Слушатели
+        logout?.setOnClickListener{
+            logout()
         }
-        var izmenit:TextView = findViewById(R.id.izmenit)
-        var surandname:TextView = findViewById(R.id.surandname)
-        var email:TextView = findViewById(R.id.email)
-        var password:TextView = findViewById(R.id.password)
-        var kolvoall:TextView = findViewById(R.id.kolvoall)
-        var logout:TextView = findViewById(R.id.signout)
-        var support:ConstraintLayout = findViewById(R.id.support)
-        var db2 = Firebase.firestore
-        var imgoftask:ImageView = findViewById(R.id.imgoftask)
-        val chip1: Chip = findViewById(R.id.chip1); val chip2: Chip = findViewById(R.id.chip2)
-        chip2.setOnClickListener {
-            if(chip1.isChecked){
-                myupdatebase()
-            }
-            chip2.isChecked = true
-            chip1.isChecked = false
+        add.setOnClickListener {
+            startActivity(Intent(this, writeareport::class.java))
         }
-        chip1.setOnClickListener {
-            if(chip2.isChecked){
-                firebaseupdate()
-            }
-            chip1.isChecked = true
-            chip2.isChecked = false
+        support?.setOnClickListener {
+            openEmail("vometix@gmail.com", "Поддержка \"${getString(R.string.app_name)}\"")
         }
-        //Карта
+        faq?.setOnClickListener {
+            openFAQquestions()
+        }
+    }
+
+    private fun initializeProfile() {
+        surandname?.text = nameOfUser
+        phone?.text = phoneOfUser
+        Picasso.get().load(imageProfile).transform(RoundedCornersTransformation(10f)).into(profileImage)
+    }
+
+    private fun initializeMap() {
         mapFragment = SupportMapFragment.newInstance()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
         fragmentTransaction.add(R.id.map_container, mapFragment)
@@ -117,27 +136,21 @@ class MainActivity : AppCompatActivity() {
                 CameraUpdateFactory.newLatLngZoom(LatLng(48.20850932439838, 41.25624814967147), 6.4f)
             )
             map.setOnMarkerClickListener {
-                Log.d("20241", "Клик на маркер карты")
                 val point = it.position
                 val isInside = isPointInsidePolygon(point, polygon)
                 if(isInside){
-                    Log.d("20241", "Клик внутри полигона")
-                    var ID = it.snippet.toString()
+                    val idOfPoint = it.snippet.toString()
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(it.position, 13.6f))
-                    Log.d("20241", "Камера идёт на точку")
-                    db2.collection("reports").document(ID).get().addOnSuccessListener {
-                        if(constrofcard.visibility == View.INVISIBLE){
-                            Log.d("20241", "Проигрыш анимации открытия")
-                            val duration = 240L
+                    db?.collection("reports")?.document(idOfPoint)?.get()?.addOnSuccessListener { it->
+                        if(constrofcard?.visibility == View.INVISIBLE){
                             val animation = TranslateAnimation(0f, 0f, 500f, 0f)
-                            animation.duration = duration
+                            animation.duration = 240L
                             animation.interpolator = AccelerateInterpolator()
-                            constrofcard.startAnimation(animation)
-                            h.postDelayed({constrofcard.visibility = View.VISIBLE}, 250)
+                            constrofcard?.startAnimation(animation)
+                            h.postDelayed({constrofcard?.visibility = View.VISIBLE}, 250)
                         }
-                        Log.d("20241", "Получение всех данных")
-                        nameofbrash.text = it.getString("name").toString()
-                        cardcategory.text = it.getString("categories").toString()
+                        nameofbrash?.text = it.getString("name").toString()
+                        cardcategory?.text = it.getString("categories").toString()
                         var statust = it.getString("status").toString()
                         when(statust){
                             "created" -> statust = "Создано"
@@ -145,13 +158,11 @@ class MainActivity : AppCompatActivity() {
                             "incomplete" -> statust = "Выполняется"
                             "completed" -> statust = "Выполнено"
                         }
-                        status.text = statust
+                        status?.text = statust
                         val id = it.id
-                        val deskofall = it.getString("deskription").toString()
-                        val revorkeddesc = limitStringLength(deskofall)
-                        carddeskription.text = revorkeddesc
-                        likes.text = it.getDouble("liked").toString()
-                        views.text = it.getLong("views").toString()
+                        carddeskription?.text = limitStringLength(it.getString("deskription").toString())
+                        likes?.text = it.getDouble("liked").toString()
+                        views?.text = it.getLong("views").toString()
                         val storage = FirebaseStorage.getInstance()
                         val storageRef = storage.reference.child("images/${it.getString("image")}")
                         storageRef.downloadUrl.addOnSuccessListener { uri ->
@@ -172,9 +183,9 @@ class MainActivity : AppCompatActivity() {
                             Log.e("20241", "Не получилось загрузить изображение у picaso: ${exception.message}")
                         }
 
-                        constrofcard.setOnClickListener {
+                        constrofcard?.setOnClickListener {
                             Log.d("20241", "Переход в содержимое карточки через карту")
-                            var intent = Intent(this@MainActivity, raiting::class.java)
+                            val intent = Intent(this@MainActivity, raiting::class.java)
                             intent.putExtra("id", id.toString())
                             startActivity(intent)
                         }
@@ -186,90 +197,69 @@ class MainActivity : AppCompatActivity() {
                 true
             }
         }
-        firebaseupdate()
-        var sp = getSharedPreferences("memory", MODE_PRIVATE)
-        ID = sp.getString("id", "null").toString()
+    }
 
-        surandname.text = ""
-        surandname.text = "${sp.getString("surname", "Error")} ${sp.getString("name", "Error")}"
-        email.text = sp.getString("email", "Error")
-        var passcode = ""
-        for(i in 0..sp.getString("password", "Error").toString().length){
-            passcode += "*"
-        }
-        password.text = passcode
-        kolvoall.text = "Оценил(а) ${sp.getLong("liked", 0)} обращений"
+    private fun closeFromPred() {
+        val yDelta = 500f  // Расстояние, на которое элемент сместится вниз
+        val duration = 480L  // Длительность анимации в миллисекундах
+        val animation = TranslateAnimation(0f, 0f, 0f, yDelta)
+        animation.duration = duration
+        animation.interpolator = AccelerateInterpolator()
+        constrofcard?.startAnimation(animation)
+        h.postDelayed({
+            constrofcard?.visibility = View.INVISIBLE
+        },490)
+    }
 
-        //Выход из аккаунта
-        logout.setOnClickListener{logout()}
-        support.setOnClickListener { sendEmail() }
-
-        var add:TextView = findViewById(R.id.add)//Кнопка создания обращения
-        add.setOnClickListener {
-            val intent = Intent(this, writeareport::class.java)//Intent на другой экран
-            startActivity(intent)//Переход
-        }
-        //Меню переключений
-
-        var textviewall:TextView = findViewById(R.id.textviewall)
-        var homepage:ConstraintLayout = findViewById(R.id.homepage)
-        var mappage:ConstraintLayout = findViewById(R.id.mappage)
-        var profilepage:ConstraintLayout = findViewById(R.id.profilepage)
-        var bottom_navigation:BottomNavigationView = findViewById(R.id.bottom_navigation)
-        bottom_navigation.setOnItemSelectedListener {item ->
+    private fun runBottomMenu() {
+        bottom_navigation?.setOnItemSelectedListener {item ->
             when(item.itemId) {
                 R.id.item_1 -> {
-                    homepage.visibility = View.VISIBLE
-                    mappage.visibility = View.INVISIBLE
-                    profilepage.visibility = View.INVISIBLE
-                    textviewall.text = "Все обращения"
+                    homepage?.visibility = View.VISIBLE
+                    mappage?.visibility = View.INVISIBLE
+                    profilepage?.visibility = View.INVISIBLE
+                    textviewall?.text = "Все обращения"
                     true
                 }
                 R.id.item_3 -> {
-                    homepage.visibility = View.INVISIBLE
-                    mappage.visibility = View.VISIBLE
-                    profilepage.visibility = View.INVISIBLE
-                    textviewall.text = "Карта"
+                    homepage?.visibility = View.INVISIBLE
+                    mappage?.visibility = View.VISIBLE
+                    profilepage?.visibility = View.INVISIBLE
+                    textviewall?.text = "Карта"
                     true
                 }
                 R.id.item_4 -> {
-                    homepage.visibility = View.INVISIBLE
-                    mappage.visibility = View.INVISIBLE
-                    profilepage.visibility = View.VISIBLE
-                    textviewall.text = "Профиль"
+                    homepage?.visibility = View.INVISIBLE
+                    mappage?.visibility = View.INVISIBLE
+                    profilepage?.visibility = View.VISIBLE
+                    textviewall?.text = "Профиль"
                     true
                 }
                 else -> false
             }
-
+        }
+        chip1?.setOnClickListener {
+            if(chip2?.isChecked == true){
+                firebaseupdate()
+            }
+            chip1?.isChecked = true
+            chip2?.isChecked = false
+        }
+        chip2?.setOnClickListener {
+            if(chip1?.isChecked == true){
+                myupdatebase()
+            }
+            chip2?.isChecked = true
+            chip1?.isChecked = false
         }
 
+    }
+
+    private fun dbUpdates() {
         val db = FirebaseFirestore.getInstance()
         db.collection("reports").addSnapshotListener { value, error ->
             Log.d("20241", "Слушатель на изменение данных в firestore")
             firebaseupdate()
-        }
-        support.setOnClickListener {
-            openEmail("vometix@gmail.com", "Поддержка \"Ответственный гражданин\"")
-        }
-        izmenit.setOnClickListener {
-            Log.d("20241", "Запуск проверки на изменение полей аккаунта")
-            var intent = Intent(this, proverka::class.java)
-            intent.putExtra("ID", ID)
-            var email = sharedPreferences.getString("email","null@789").toString()
-            var password = sharedPreferences.getString("password","NOLESS").toString()
-            if(email != "null@789" && password != "NOLESS"){
-                intent.putExtra("email", email)
-                intent.putExtra("password", password)
-                startActivity(intent)
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            }
-            else{
-                Toast.makeText(this@MainActivity, "Ошибка!", Toast.LENGTH_LONG).show()
-            }
-        }
-        faq.setOnClickListener {
-            openFAQquestions()
         }
     }
 
@@ -292,12 +282,6 @@ class MainActivity : AppCompatActivity() {
                     val reportsList = mutableListOf<CustomModel>()
                     for (document in result) {
                         if(document.getString("from").toString() == MainActivity.ID){
-                            var lat = 0.0
-                            var lon = 0.0
-                            var name = ""
-                            lat = document.getDouble("wherelat")!!
-                            lon = document.getDouble("wherelon")!!
-                            name = document.getString("name").toString()
                             val report = CustomModel(
                                 document.id.toString(),
                                 document.getString("name").toString(),
@@ -382,37 +366,38 @@ class MainActivity : AppCompatActivity() {
     }
     private fun logout(){
         Log.d("20241", "Окно выхода")
-        MaterialAlertDialogBuilder(this)
+        MaterialAlertDialogBuilder(this@MainActivity)
             .setTitle("Выход")
             .setMessage("Вы точно хотите выйти из аккаунта?")
             .setNegativeButton("Нет") { dialog, which ->
                 Log.d("2024", "Не выполнен выход из аккаунта")
             }
             .setPositiveButton("Да") { dialog, which ->
-                val sp = getSharedPreferences("memory", MODE_PRIVATE).edit()
-                sp.clear().apply()
-                Log.d("2024", "Выполнен выход из аккаунта")
-                startActivity(Intent(this, splashscreen::class.java))
+                VKID.instance.logout(
+                    lifecycleOwner = this@MainActivity,
+                    callback = object : VKIDLogoutCallback {
+                        override fun onFail(fail: VKIDLogoutFail) {
+                            Snackbar.make(findViewById(R.id.back), "Не получилось выполнить выход!", Snackbar.LENGTH_LONG).show()
+                        }
+
+                        override fun onSuccess() {
+                            Log.d("2024", "Выполнен выход из аккаунта")
+                            startActivity(Intent(this@MainActivity, splashscreen::class.java))
+                        }
+                    }
+                )
+
             }
             .show()
+
     }
-    private fun sendEmail() {
-        val emailIntent = Intent(Intent.ACTION_SENDTO)
-        emailIntent.data = Uri.parse("mailto:") // указываем схему "mailto:" для отправки по email
-        emailIntent.putExtra(Intent.EXTRA_EMAIL, arrayOf("vometix@gmail.com"))
-        emailIntent.putExtra(Intent.EXTRA_SUBJECT, "Поддержка по приложению Отечественный Гражданин")
-        emailIntent.putExtra(Intent.EXTRA_TEXT, "")
-        // Проверяем, есть ли почтовое приложение на устройстве, которое может обработать наше намерение
-        if (emailIntent.resolveActivity(packageManager) != null) {
-            Log.d("20241", "Переход в поддержку")
-            startActivity(emailIntent)
-        }
-    }
+
     override fun onBackPressed() {
 
     }
     private fun drawRostovRegion() {
-        val rostovRegion = listOf<LatLng>(LatLng(47.13553438153998, 38.302159754585915),
+        val rostovRegion = listOf<LatLng>(
+            LatLng(47.13553438153998, 38.302159754585915),
             LatLng(47.626788207924484, 38.64693558667729),
             LatLng(47.675911216330555, 38.80838119541676),
             LatLng(47.853823989308516, 38.85773830894567),
@@ -473,12 +458,11 @@ class MainActivity : AppCompatActivity() {
             LatLng(46.831931848238426, 38.6897452908099),
             LatLng(46.87883828720678, 38.68945077735905),
             LatLng(47.11920264845045, 38.230287189210635),
-        // Добавьте остальные координаты границ области
         )
         val polygonOptions = PolygonOptions()
             .addAll(rostovRegion)
             .strokeColor(resources.getColor(R.color.purple_200))
-            .fillColor(resources.getColor(R.color.blue_tran)) // Красный цвет с некоторой прозрачностью
+            .fillColor(resources.getColor(R.color.blue_tran))
         rostovPolygon = mMap.addPolygon(polygonOptions)
         polygon = rostovRegion
         mMap.clear()

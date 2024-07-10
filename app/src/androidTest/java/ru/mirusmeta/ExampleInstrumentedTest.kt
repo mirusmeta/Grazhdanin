@@ -1,4 +1,4 @@
-package ru.southcode
+package ru.mirusmeta
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4

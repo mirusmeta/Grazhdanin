@@ -3,7 +3,7 @@
     <!-- Состояние для отключенной кнопки -->
     <item >
         <shape android:shape="rectangle">
-            <corners android:radius="20dp" />
+            <corners android:radius="16dp" />
             <solid android:color="#7DCEFF" /> <!-- Цвет для включенного состояния -->
         </shape>
     </item>
