@@ -1,13 +1,16 @@
 package ru.mirusmeta
 
+import android.animation.ObjectAnimator
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.TranslateAnimation
@@ -54,8 +57,9 @@ class MainActivity : AppCompatActivity() {
     private var db:FirebaseFirestore? = null
 
     //ФИО и Телефон
-    private val nameOfUser by lazy { "Имя пользователя: ${VKID.instance.accessToken?.userData?.firstName} ${VKID.instance.accessToken?.userData?.lastName}" }
+    private val nameOfUser by lazy { "Вы: ${VKID.instance.accessToken?.userData?.firstName} ${VKID.instance.accessToken?.userData?.lastName}" }
     private val phoneOfUser by lazy { "Телефон: +${VKID.instance.accessToken?.userData?.phone}" }
+    private val phoneOfUserWithoutText by lazy { "+${VKID.instance.accessToken?.userData?.phone}" }
 
 
     //Разметка объявление
@@ -127,8 +131,7 @@ class MainActivity : AppCompatActivity() {
     private fun initializeMap() {
         mapFragment = SupportMapFragment.newInstance()
         val fragmentTransaction = supportFragmentManager.beginTransaction()
-        fragmentTransaction.add(R.id.map_container, mapFragment)
-        fragmentTransaction.commit()
+        fragmentTransaction.add(R.id.map_container, mapFragment).commit()
         mapFragment.getMapAsync{ map ->
             mMap = map
             drawRostovRegion()
@@ -136,49 +139,61 @@ class MainActivity : AppCompatActivity() {
                 CameraUpdateFactory.newLatLngZoom(LatLng(48.20850932439838, 41.25624814967147), 6.4f)
             )
             map.setOnMarkerClickListener {
-                val point = it.position
-                val isInside = isPointInsidePolygon(point, polygon)
-                if(isInside){
+                if(isPointInsidePolygon(it.position, polygon)){
                     val idOfPoint = it.snippet.toString()
                     map.animateCamera(CameraUpdateFactory.newLatLngZoom(it.position, 13.6f))
                     db?.collection("reports")?.document(idOfPoint)?.get()?.addOnSuccessListener { it->
                         if(constrofcard?.visibility == View.INVISIBLE){
-                            val animation = TranslateAnimation(0f, 0f, 500f, 0f)
-                            animation.duration = 240L
-                            animation.interpolator = AccelerateInterpolator()
-                            constrofcard?.startAnimation(animation)
-                            h.postDelayed({constrofcard?.visibility = View.VISIBLE}, 250)
+                            constrofcard?.apply {
+                                visibility = View.VISIBLE
+                                translationY = 500f
+                                val animator = ObjectAnimator.ofFloat(this, "translationY", 0f).apply {
+                                    duration = 400L
+                                    interpolator = AccelerateDecelerateInterpolator()
+                                }
+                                animator.start()
+                            }
                         }
                         nameofbrash?.text = it.getString("name").toString()
                         cardcategory?.text = it.getString("categories").toString()
-                        var statust = it.getString("status").toString()
-                        when(statust){
-                            "created" -> statust = "Создано"
-                            "viewed" -> statust = "Просмотрено"
-                            "incomplete" -> statust = "Выполняется"
-                            "completed" -> statust = "Выполнено"
-                        }
+                        val statusMap = mapOf(
+                            "created" to "Создано",
+                            "viewed" to "Просмотрено",
+                            "incomplete" to "Выполняется",
+                            "completed" to "Выполнено",
+                            "denclined" to "Отклонено"
+                        )
+
+                        val statust = it.getString("status")?.let { status ->
+                            statusMap.getOrDefault(status, "Ошибка загрузки")
+                        } ?: "Ошибка загрузки"
+
                         status?.text = statust
                         val id = it.id
                         carddeskription?.text = limitStringLength(it.getString("deskription").toString())
-                        likes?.text = it.getDouble("liked").toString()
-                        views?.text = it.getLong("views").toString()
-                        val storage = FirebaseStorage.getInstance()
-                        val storageRef = storage.reference.child("images/${it.getString("image")}")
+
+                        var ratesOfAll: Double? = 0.0
+                        var kolvoAll:Int? = 0
+                        it.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                            val parts = pair.split(":")
+                            val phone = "+${parts[0]}"
+                            val rate = parts[1].toInt()
+                            ratesOfAll = ratesOfAll!! + rate
+                            kolvoAll = kolvoAll!! + 1
+                            phone to rate
+                        }
+                        if(kolvoAll != 0){
+                            likes.text = (ratesOfAll!! / kolvoAll!!).toString()
+                            views.text = kolvoAll.toString()
+                        }else{
+                            likes.text = "0"
+                            views.text = "0"
+                        }
+
+
+                        val storageRef = FirebaseStorage.getInstance().reference.child("images/${it.getString("image")}")
                         storageRef.downloadUrl.addOnSuccessListener { uri ->
-                            Picasso.get().load(uri).into(object : com.squareup.picasso.Target {
-                                override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
-                                    val roundedDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
-                                    roundedDrawable.cornerRadius = 16f
-                                    imgoftask.setImageDrawable(roundedDrawable)
-                                }
-
-                                override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
-                                    Log.e("20241", "Не получилось загрузить изображение у picaso: ${e?.message}")
-                                }
-
-                                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-                            })
+                            Picasso.get().load(uri).transform(RoundedCornersTransformation(20f)).into(imgoftask)
                         }.addOnFailureListener { exception ->
                             Log.e("20241", "Не получилось загрузить изображение у picaso: ${exception.message}")
                         }
@@ -201,14 +216,15 @@ class MainActivity : AppCompatActivity() {
 
     private fun closeFromPred() {
         val yDelta = 500f  // Расстояние, на которое элемент сместится вниз
-        val duration = 480L  // Длительность анимации в миллисекундах
+        val duration = 302L  // Длительность анимации в миллисекундах
         val animation = TranslateAnimation(0f, 0f, 0f, yDelta)
         animation.duration = duration
         animation.interpolator = AccelerateInterpolator()
         constrofcard?.startAnimation(animation)
         h.postDelayed({
             constrofcard?.visibility = View.INVISIBLE
-        },490)
+        }, 20)
+
     }
 
     private fun runBottomMenu() {
@@ -281,15 +297,38 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { result ->
                     val reportsList = mutableListOf<CustomModel>()
                     for (document in result) {
-                        if(document.getString("from").toString() == MainActivity.ID){
-                            val report = CustomModel(
-                                document.id.toString(),
-                                document.getString("name").toString(),
-                                "Место: ${document.getString("city").toString()}",
-                                "images/${document.getString("image").toString()}",
-                                document.id.toString(),
-                                document.getDouble("liked")!!
-                            )
+                        if(document.getString("from").toString() == phoneOfUserWithoutText){
+                            var ratesOfAll: Double? = 0.0
+                            var kolvoAll:Int? = 0
+                            document.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                                val parts = pair.split(":")
+                                val phone = "+${parts[0]}"
+                                val rate = parts[1].toInt()
+                                ratesOfAll = ratesOfAll!! + rate
+                                kolvoAll = kolvoAll!! + 1
+                                phone to rate
+                            }
+                            var report:CustomModel
+                            if(kolvoAll != 0){
+                                report = CustomModel(
+                                    document.id.toString(),
+                                    document.getString("name").toString(),
+                                    "Место: ${document.getString("city").toString()}",
+                                    "images/${document.getString("image").toString()}",
+                                    document.id.toString(),
+                                    ((ratesOfAll!! / kolvoAll!!).toDouble())
+                                )
+                            }
+                            else{
+                                report = CustomModel(
+                                    document.id.toString(),
+                                    document.getString("name").toString(),
+                                    "Место: ${document.getString("city").toString()}",
+                                    "images/${document.getString("image").toString()}",
+                                    document.id.toString(),
+                                    0.0
+                                )
+                            }
                             reportsList.add(report)
                         }
                     }
@@ -324,20 +363,41 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { result ->
                     val reportsList = mutableListOf<CustomModel>()
                     for (document in result) {
-                        var lat = 0.0
-                        var lon = 0.0
-                        var name = ""
-                        lat = document.getDouble("wherelat")!!
-                        lon = document.getDouble("wherelon")!!
-                        name = document.getString("name").toString()
-                        val report = CustomModel(
-                            document.id.toString(),
-                            document.getString("name").toString(),
-                            "Место: ${document.getString("city").toString()}",
-                            "images/${document.getString("image").toString()}",
-                            document.id.toString(),
-                            document.getDouble("liked")!!
-                        )
+                        val lat = document.getDouble("wherelat")!!
+                        val lon = document.getDouble("wherelon")!!
+                        val name = document.getString("name").toString()
+                        var ratesOfAll: Double? = 0.0
+                        var kolvoAll:Int? = 0
+
+                        document.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                            val parts = pair.split(":")
+                            val phone = "+${parts[0]}"
+                            val rate = parts[1].toInt()
+                            ratesOfAll = ratesOfAll!! + rate
+                            kolvoAll = kolvoAll!! + 1
+                            phone to rate
+                        }
+                        var report:CustomModel
+                        if(kolvoAll != 0){
+                            report = CustomModel(
+                                document.id.toString(),
+                                document.getString("name").toString(),
+                                "Место: ${document.getString("city").toString()}",
+                                "images/${document.getString("image").toString()}",
+                                document.id.toString(),
+                                ((ratesOfAll!! / kolvoAll!!).toDouble())
+                            )
+                        }
+                        else{
+                            report = CustomModel(
+                                document.id.toString(),
+                                document.getString("name").toString(),
+                                "Место: ${document.getString("city").toString()}",
+                                "images/${document.getString("image").toString()}",
+                                document.id.toString(),
+                                0.0
+                            )
+                        }
                         reportsList.add(report)
                         mapFragment.getMapAsync {map ->
                             when(document.getString("status").toString()){
@@ -366,7 +426,7 @@ class MainActivity : AppCompatActivity() {
     }
     private fun logout(){
         Log.d("20241", "Окно выхода")
-        MaterialAlertDialogBuilder(this@MainActivity)
+        MaterialAlertDialogBuilder(this@MainActivity, R.style.ThemeOverlay_App_MaterialAlertDialog)
             .setTitle("Выход")
             .setMessage("Вы точно хотите выйти из аккаунта?")
             .setNegativeButton("Нет") { dialog, which ->

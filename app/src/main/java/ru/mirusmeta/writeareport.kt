@@ -25,15 +25,22 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.maps.model.Polygon
 import com.google.android.gms.maps.model.PolygonOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
+import com.vk.id.VKID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
 class writeareport : AppCompatActivity() {
+
     private var imagechoosen = false
+    private var ADRESS = "null"
     private lateinit var geocoder: Geocoder
     private var lat = 75.428510
     private var lon = 23.621840
@@ -41,15 +48,17 @@ class writeareport : AppCompatActivity() {
     private lateinit var rostovPolygon: Polygon
     private var IDofZaiavka = "-985"
     private lateinit var polygon: List<LatLng>
+
+
     private val getContent =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
                 Log.i("20241", "Получена картинка")
                 val selectedImageUri = result.data?.data
-                var image: ImageView = findViewById(R.id.image)
+                val image: ImageView = findViewById(R.id.image)
                 Picasso.get().load(selectedImageUri).into(image)
                 imagechoosen = true
-                var imgchoosen: TextView = findViewById(R.id.imgchoosen)
+                val imgchoosen: TextView = findViewById(R.id.imgchoosen)
                 imgchoosen.visibility = View.INVISIBLE
             }
             else{
@@ -57,23 +66,39 @@ class writeareport : AppCompatActivity() {
             }
         }
 
+    val mapcon by lazy{
+        findViewById<ConstraintLayout>(R.id.mapcon)
+    }
+    val kategorytext by lazy{
+        findViewById<TextView>(R.id.kategorytext)
+    }
+    val deskriptiontext by lazy{
+        findViewById<TextView>(R.id.deskriptiontext)
+    }
+    val chooseimg by lazy{
+        findViewById<ConstraintLayout>(R.id.chooseimg)
+    }
+    val buttonchoose by lazy{
+        findViewById<Button>(R.id.buttonchoose)
+    }
+    val chooseplace by lazy{
+        findViewById<TextView>(R.id.chooseplace)
+    }
+    val sendform by lazy{
+        findViewById<Button>(R.id.sendform)
+    }
+    val maintext by lazy{
+        findViewById<TextView>(R.id.maintext)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_writeareport)
+        val db = Firebase.firestore
+
         geocoder = Geocoder(this)
         var checkedItem = 0
-        val sp = getSharedPreferences("memory", MODE_PRIVATE).edit()
-        val mapcon: ConstraintLayout = findViewById(R.id.mapcon)
-        val kategorytext: TextView = findViewById(R.id.kategorytext)
-        val deskriptiontext: TextView = findViewById(R.id.deskriptiontext)
-        val chooseimg: ConstraintLayout = findViewById(R.id.chooseimg)
-        val buttonchoose: Button = findViewById(R.id.buttonchoose)
-        val choosecity: TextView = findViewById(R.id.choosecity)
-        val chooseplace: TextView = findViewById(R.id.chooseplace)
-        val sendform: Button = findViewById(R.id.sendform)
-        val maintext: TextView = findViewById(R.id.maintext)
         kategorytext.setOnClickListener {
-            Log.d("20241", "Выборка категорий")
             val singleItems = arrayOf("Улица", "Транспорт", "Техническое")
             MaterialAlertDialogBuilder(this, R.style.ThemeOverlay_App_MaterialAlertDialog)
                 .setTitle("Выберите категорию")
@@ -81,50 +106,43 @@ class writeareport : AppCompatActivity() {
                 .setSingleChoiceItems(singleItems, checkedItem) { dialog, which ->
                     checkedItem = which
                     kategorytext.text = singleItems[which]
-                    Log.i("20241", "Выбрана категория ${singleItems[which]}")
                 }.show()
         }
         sendform.setOnClickListener {
             if (!imagechoosen || maintext.text.toString()
-                    .isEmpty() || choosecity.text.toString()
                     .isEmpty() || lat == 0.0 || lon == 0.0 || deskriptiontext.text.toString()
-                    .isEmpty() || kategorytext.text.toString().isEmpty()
+                    .isEmpty() || kategorytext.text.toString().isEmpty() || ADRESS == "null"
             ) {
-                Log.e("20241", "Заполнены не все поля")
-                Toast.makeText(this, "Не все поля заполнены!", Toast.LENGTH_LONG).show()
+                Snackbar.make(findViewById(R.id.backgroud), "Не все поля заполнены!", Snackbar.LENGTH_LONG).show()
             } else {
-                Log.d("20241", "Все поля заполнены")
-                val db = Firebase.firestore
                 val imageView = findViewById<ImageView>(R.id.image)
                 val bitmap = (imageView.drawable as BitmapDrawable).bitmap
-                val nameofimg = generateRandomString()
-                Log.i("20241", "Сгенерирована название картинки: ${nameofimg}.jpg")
-                val storageRef = FirebaseStorage.getInstance().reference.child("images/$nameofimg")
+                val NAMEOFIMAGE = generateRandomString()
+                val storageRef = FirebaseStorage.getInstance().reference.child("images/$NAMEOFIMAGE")
                 val baos = ByteArrayOutputStream()
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
                 val data = baos.toByteArray()
                 storageRef.putBytes(data)
-                Log.i("20241", "Картинка отгружена в бд")
+
                 val report = hashMapOf(
                     "categories" to kategorytext.text.toString(),
                     "deskription" to deskriptiontext.text.toString(),
                     "views" to 0,
                     "status" to "created",
                     "availbe" to "true",
-                    "city" to choosecity.text.toString(),
-                    "from" to MainActivity.ID,
+                    "city" to ADRESS,
+                    "from" to "+${VKID.instance.accessToken?.userData?.phone.toString()}",
                     "liked" to 0.0,
                     "name" to maintext.text.toString(),
                     "wherelat" to lat,
                     "wherelon" to lon,
-                    "image" to nameofimg
+                    "image" to NAMEOFIMAGE,
+                    "marksofall" to ""
                 )
                 db.collection("reports")
                     .add(report)
                     .addOnSuccessListener { documentReference ->
                         Log.v("20241", "Обращение добавлено")
-                        var sp2 = getSharedPreferences("memory", MODE_PRIVATE)
-                        sp.putString("myobr", "${sp2.getString("myobr", "")}|${documentReference.id}:created").apply()
                         IDofZaiavka = documentReference.id
                         updateuser()
                     }
@@ -140,8 +158,7 @@ class writeareport : AppCompatActivity() {
         buttonchoose.setOnClickListener {
             mapcon.visibility = View.INVISIBLE
             sendform.visibility = View.VISIBLE
-            chooseplace.text = "$lat, $lon"
-            Log.i("20241", "Выбраны координаты: $lat;$lon")
+            chooseplace.text = ADRESS
         }
         chooseplace.setOnClickListener {//Подругзка gMap
             Log.d("20241", "Открытие карты")
@@ -189,9 +206,9 @@ class writeareport : AppCompatActivity() {
                         lat = latitude
                         lon = longitude
                         buttonchoose.isEnabled = true
-                        var address = getAddressFromLocation(lat, lon)
+                        val address = getAddressFromLocation(lat, lon)
                         if (address != "незнаючтозаадресс") {
-                            choosecity.text = address
+                            ADRESS = address
                         }
                     }
 
@@ -202,25 +219,8 @@ class writeareport : AppCompatActivity() {
     }
 
     private fun updateuser() {
-        if(IDofZaiavka != "-985"){
-            var db = Firebase.firestore
-            var editgo = this.getSharedPreferences("memory", Context.MODE_PRIVATE)?.edit()
-
-            db.collection("users").document(MainActivity.ID).get().addOnSuccessListener {
-                Log.i("20241", "Добавлена заявка")
-                val informationbefore = it.getString("minefilds").toString()
-                var db2 = Firebase.firestore
-                db.collection("users").document(MainActivity.ID).update("minefilds", "$informationbefore|$IDofZaiavka:created").addOnSuccessListener {
-                    editgo?.putString("myobr", "$informationbefore|$IDofZaiavka:created")?.apply()
-                    finish()
-                }
-            }.addOnFailureListener {
-                Log.e("20241", "Не добавлена заявка: ${it.message.toString()}")
-            }
-        }
-        else{
-            Log.e("20241", "Не пройдена проверка")
-        }
+        //Тут будет добавлена задача к нашему юзеру, но позже
+        finish()
     }
 
     private fun openGallery() {//Открытие activityforresult()

@@ -2,8 +2,8 @@
 <resources>
     <color name="blue_tran">#002592EF</color>
     <color name="purple_200">#2592EF</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
+    <color name="purple_500">#1386E7</color>
+    <color name="purple_700">#006BC7</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>

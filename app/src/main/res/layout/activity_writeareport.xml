@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="#FCFDFF"
+    android:id="@+id/backgroud"
     tools:context=".writeareport">
 
     <TextView
@@ -45,10 +46,42 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:textSize="16dp"
+            android:textSize="17dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:textColor="#2C2C2C"
+        android:id="@+id/chooseplace"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/map_background"
+        android:gravity="center"
+        android:textSize="18dp"
+        android:text="Место на карте"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseimg" />
+    <TextView
+        android:layout_marginTop="20dp"
+        android:id="@+id/kategorytext"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:background="@drawable/defaultmenu"
+        android:ems="10"
+        android:inputType="text"
+        android:paddingLeft="16dp"
+        android:textSize="17dp"
+        android:gravity="center_vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:hint="Категория"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chooseplace" />
     <EditText
         android:id="@+id/maintext"
         android:layout_width="match_parent"
@@ -63,69 +96,27 @@
         android:paddingLeft="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chooseimg" />
+        app:layout_constraintTop_toBottomOf="@+id/kategorytext" />
     <EditText
+        android:maxLength="200"
+        android:paddingEnd="10dp"
         android:id="@+id/deskriptiontext"
         android:layout_width="match_parent"
-        android:layout_height="60dp"
+        android:paddingVertical="16dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="20dp"
         android:background="@drawable/defaultmenu"
         android:ems="10"
-        android:inputType="text"
+        android:inputType="textMultiLine"
         android:hint="Описание"
         android:paddingLeft="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/maintext" />
 
-    <EditText
-        android:layout_marginTop="20dp"
-        android:id="@+id/choosecity"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/defaultmenu"
-        android:ems="10"
-        android:hint="Адрес"
-        android:inputType="text"
-        android:paddingLeft="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/deskriptiontext" />
 
-    <TextView
-        android:layout_marginTop="20dp"
-        android:id="@+id/kategorytext"
-        android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:background="@drawable/defaultmenu"
-        android:ems="10"
-        android:inputType="text"
-        android:paddingLeft="16dp"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:hint="Категория"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/choosecity" />
-
-    <TextView
-        android:id="@+id/chooseplace"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/defaultmenu"
-        android:gravity="center"
-        android:text="Место на карте"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/kategorytext" />
 
 
     <androidx.appcompat.widget.AppCompatButton
@@ -134,11 +125,11 @@
         android:layout_height="60dp"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/styleofbuttonsignin"
+        android:background="@drawable/knopkaotpravit"
         android:text="Отправить форму"
         android:textAllCaps="false"
         android:layout_marginBottom="40dp"
-        android:textColor="@color/white"
+        android:textColor="#2C2C2C"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

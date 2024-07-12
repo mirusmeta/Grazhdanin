@@ -11,72 +11,105 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.RatingBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
+import com.vk.id.VKID
 import kotlin.math.floor
 
 class raiting : AppCompatActivity() {
+
+    private val statusot by lazy{
+        findViewById<TextView>(R.id.statusot)
+    }
+    private val likes by lazy{
+        findViewById<TextView>(R.id.likes)
+    }
+    private val views by lazy{
+        findViewById<TextView>(R.id.views)
+    }
+    private val category by lazy{
+        findViewById<TextView>(R.id.category)
+    }
+    private val name by lazy{
+        findViewById<TextView>(R.id.name)
+    }
+    private val desciption by lazy{
+        findViewById<TextView>(R.id.desciption)
+    }
+    private val myImageForLoading by lazy{
+        findViewById<ImageView>(R.id.imagev)
+    }
+    private val ochen by lazy{
+        findViewById<Button>(R.id.ochen)
+    }
+    private val phoneOfUserWithoutText by lazy { "+${VKID.instance.accessToken?.userData?.phone}" }
+
+
+    //Единицы
+    private var lat = 0.0
+    private var lon = 0.0
+    private var stringOfAll:String? = ""
+    private var ratesOfAll: Double? = 0.0
+    private var kolvoAll:Int? = 0
+    private var MYRATE:Int? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_raiting)
-        enableEdgeToEdge()
-        Log.d("20241", "Переход в activity оценивания")
-        val statusot:TextView = findViewById(R.id.statusot)
-        val likes:TextView = findViewById(R.id.likes)
-        val views:TextView = findViewById(R.id.views)
-        val category:TextView = findViewById(R.id.category)
-        val name:TextView = findViewById(R.id.name)
-        val textView3:TextView = findViewById(R.id.textView3)
+
         val id = intent.getStringExtra("id")
         val db = Firebase.firestore
-        var lat = 0.0
-        var lon = 0.0
-        var olrait = 0.0
-        var kv = 1
-        val ochen:Button = findViewById(R.id.ochen)
+
         ochen.isEnabled = false
         val ratingBar:RatingBar = findViewById(R.id.ratingBar)
-        ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser ->
-            Log.d("20241", "Изменена оценка: ${rating} из 5.0")
-            ochen.isEnabled = true
-        }
-        //Проверка у пользователя
-        val sp = getSharedPreferences("memory", MODE_PRIVATE)
-        val likes1 = sp.getString("votes", "dontgotten").toString()
-        if(likes1 != "dontgotten"){
-            if(likes1.contains(id.toString())){
-                ochen.visibility = View.INVISIBLE
-                ratingBar.rating = likes1.substringAfter("$id;", "").substringBefore("|").toFloat()
-                Log.d("20241", "Вы уже оценивали это обращение: ${ratingBar.rating}")
-            }
-        }
-        //Проверка самого репорта
+        ratingBar.setOnRatingBarChangeListener { ratingBar, rating, fromUser -> ochen.isEnabled = true }
+
         db.collection("reports").document(id.toString()).get().addOnSuccessListener {
-            Log.d("20241", "Данные с бд получены")
             name.text = it.getString("name")
+
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference.child("images/${it.getString("image")}")
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                loadImageWithRoundedCorners(uri.toString())
-            }.addOnFailureListener { exception ->
-                Log.e("20241", "Картинка не загружена из бд: ${exception.message}")
+                Picasso.get().load(uri).transform(RoundedCornersTransformation(34f)).into(myImageForLoading)
             }
-            olrait = it.getDouble("liked")!!
+
+            stringOfAll = it.getString("marksofall")
+            stringOfAll?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                val parts = pair.split(":")
+                val phone = "+${parts[0]}"
+                val rate = parts[1].toInt()
+                ratesOfAll = ratesOfAll!! + rate
+                kolvoAll = kolvoAll!! + 1
+                if(phoneOfUserWithoutText == phone){
+                    MYRATE = rate
+                    ratingBar.rating = MYRATE!!.toFloat()
+                    ochen.visibility = View.INVISIBLE
+                }
+                phone to rate
+            }
+            if(kolvoAll != 0){
+                likes.text = (ratesOfAll!! / kolvoAll!!).toString()
+                views.text = kolvoAll.toString()
+            }else{
+                likes.text = "0"
+                views.text = "0"
+            }
+
+
             lat = it.getDouble("wherelat")!!
             lon = it.getDouble("wherelon")!!
             category.text = it.getString("categories").toString()
-            views.text = it.getLong("views").toString()
-            likes.text = it.getDouble("liked").toString()
-            kv += it.getLong("views")!!.toInt()
             val st = it.getString("status")
             when(st){
                 "created" -> statusot.text = "Создано"
@@ -101,7 +134,7 @@ class raiting : AppCompatActivity() {
                 startIndex = endIndex + 1
                 endIndex = startIndex + maxLineLength
             }
-            textView3.text = formattedText.toString().trim { it <= ' ' }
+            desciption.text = formattedText.toString().trim { it <= ' ' }
         }.addOnFailureListener {
             Log.e("20241", "Данные с бд не получены")
         }
@@ -111,7 +144,6 @@ class raiting : AppCompatActivity() {
             val fragmentTransaction = supportFragmentManager.beginTransaction()
             fragmentTransaction.add(R.id.map_container, mapFragment)
             fragmentTransaction.commit()
-            // Задаем слушателю события onMapClick
             mapFragment.getMapAsync { map ->
                 map.addMarker(MarkerOptions().title("Место").position(LatLng(lat, lon)))
                 map.animateCamera(
@@ -121,47 +153,13 @@ class raiting : AppCompatActivity() {
             }
         },600)
         ochen.setOnClickListener {
-            if(olrait == 0.0){
-                olrait = ratingBar.rating.toDouble()
-            }
-            else{
-                olrait = (olrait + ratingBar.rating) / 2.0
-                olrait = floor(olrait * 10.0) / 10.0
-            }
-            db.collection("users").document(MainActivity.ID).get().addOnSuccessListener {
-                val k:Long = it.getLong("liked")!! + 1
-                val likedme = it.getString("votes").toString() + "${id};${ratingBar.rating.toDouble()}|"
-                var sharedPreferences = getSharedPreferences("memory", MODE_PRIVATE).edit()
-                sharedPreferences.putString("votes", likedme).apply()
-                db.collection("users").document(MainActivity.ID).update(mapOf("liked" to k, "votes" to likedme)).addOnSuccessListener {
-                    db.collection("reports").document(id.toString()).update(mapOf("liked" to olrait, "views" to kv)).addOnSuccessListener {
-                        Log.i("20241", "Выставлена оценка")
-                        finish()
-                    }.addOnFailureListener {
-                        Log.e("20241", "Данные обращения не обновлены")
-                    }
-                }.addOnFailureListener {
-                    Log.e("20241", "Данные пользователя не обновлены")
+            if(stringOfAll != null){
+                stringOfAll += "$phoneOfUserWithoutText:${ratingBar.rating.toInt()}"
+                db.collection("reports").document(id.toString()).update(mapOf("marksofall" to stringOfAll)).addOnSuccessListener {
+                    finish()
                 }
-            }.addOnFailureListener {
-                Log.e("20241", "Данные с бд не получены")
             }
 
         }
     }
-    private fun loadImageWithRoundedCorners(url: String) {
-        Picasso.get().load(url)
-            .into(object : Target {
-                override fun onBitmapLoaded(bitmap: Bitmap, from: Picasso.LoadedFrom) {
-                    val roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(resources, bitmap)
-                    roundedBitmapDrawable.cornerRadius = 28f
-                    findViewById<ImageView>(R.id.imagev).setImageDrawable(roundedBitmapDrawable)
-                }
-
-                override fun onBitmapFailed(e: Exception?, errorDrawable: Drawable?) {}
-
-                override fun onPrepareLoad(placeHolderDrawable: Drawable?) {}
-            })
-    }
-
 }

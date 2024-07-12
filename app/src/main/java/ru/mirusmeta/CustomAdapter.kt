@@ -24,14 +24,14 @@ class CustomAdapter(private val context: Context, private val dataList: List<Cus
         holder.textViewName.text = currentItem.name
         holder.textViewDescription.text = currentItem.description
         holder.iddoc.text = currentItem.iddoc
+
         if(helloactivity.isAdmin){
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, RaitingAdmin::class.java)
                 intent.putExtra("id", currentItem.iddoc)
                 context.startActivity(intent)
             }
-        }
-        else{
+        } else {
             holder.itemView.setOnClickListener {
                 val intent = Intent(context, raiting::class.java)
                 intent.putExtra("id", currentItem.iddoc)
@@ -43,14 +43,14 @@ class CustomAdapter(private val context: Context, private val dataList: List<Cus
         val storageRef = storage.reference.child(currentItem.imageUrl)
 
         storageRef.downloadUrl.addOnSuccessListener { uri ->
-            // Успешно получили ссылку, загружаем изображение с использованием Picasso
-            Picasso.get().load(uri).into(holder.imagev)
+            Picasso.get()
+                .load(uri)
+                .transform(RoundedCornersTransformation(40f)) // радиус скругления углов
+                .into(holder.imagev)
         }.addOnFailureListener { exception ->
-            // Обработка ошибки
             Log.e("FirestoreImageLoadError", "Failed to load image: ${exception.message}")
         }
     }
-
 
     override fun getItemCount(): Int = dataList.size
 
