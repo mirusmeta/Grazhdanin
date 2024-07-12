@@ -221,21 +221,6 @@ class AdminMainActivity : AppCompatActivity() {
         support.setOnClickListener {
             openEmail("vometix@gmail.com", "Поддержка \"Ответственный гражданин\"")
         }
-        izmenit.setOnClickListener {
-            var intent = Intent(this, proverka::class.java)
-            intent.putExtra("ID", MainActivity.ID)
-            var email = sharedPreferences.getString("email","null@789").toString()
-            var password = sharedPreferences.getString("password","NOLESS").toString()
-            if(email != "null@789" && password != "NOLESS"){
-                intent.putExtra("email", email)
-                intent.putExtra("password", password)
-                startActivity(intent)
-                overridePendingTransition(R.anim.fade_in, R.anim.fade_out)
-            }
-            else{
-                Toast.makeText(this@AdminMainActivity, "Ошибка!", Toast.LENGTH_LONG).show()
-            }
-        }
     }
     private lateinit var userSearchView: com.google.android.material.search.SearchView
     private fun initusers() {
