@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.os.Bundle
 import android.widget.TextView

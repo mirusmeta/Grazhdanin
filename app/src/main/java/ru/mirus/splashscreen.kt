@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.content.Context
 import android.content.Intent
@@ -8,20 +8,14 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.firestore.FirebaseFirestore
-import com.vk.id.OAuth
 import com.vk.id.VKID
-import com.vk.id.logout.VKIDLogoutCallback
-import com.vk.id.logout.VKIDLogoutFail
-import com.vk.id.refresh.VKIDRefreshTokenFail
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 class splashscreen : AppCompatActivity() {
 
@@ -41,28 +35,45 @@ class splashscreen : AppCompatActivity() {
         textView = findViewById(R.id.textView)
         btn = findViewById(R.id.btn)
 
-        checkInternetConnection()
+        val imgLogo = findViewById<ImageView>(R.id.img)
+        val slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down)
+        imgLogo.startAnimation(slideDownAnimation)
+
+        slideDownAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation?) {}
+            override fun onAnimationRepeat(animation: Animation?) {}
+
+            override fun onAnimationEnd(animation: Animation?) {
+                val swingAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.swing)
+                imgLogo.startAnimation(swingAnimation)
+            }
+        })
+
+        // Check internet connection in background
+        CoroutineScope(Dispatchers.IO).launch {
+            checkInternetConnection()
+        }
     }
 
-    private fun checkInternetConnection() {
+    private suspend fun checkInternetConnection() {
         if (isNetworkAvailable()) {
             Log.i("20241", "Есть интернет")
             loadData()
         } else {
-            showNoInternetUI()
-            btn?.setOnClickListener {
-                recreate()
+            withContext(Dispatchers.Main) {
+                showNoInternetUI()
+                btn?.setOnClickListener {
+                    recreate()
+                }
             }
         }
     }
 
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val networkCapabilities = connectivityManager.activeNetwork ?: return false
-            val actNw =
-                connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
+            val actNw = connectivityManager.getNetworkCapabilities(networkCapabilities) ?: return false
             actNw.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) ||
                     actNw.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                     actNw.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
@@ -78,9 +89,9 @@ class splashscreen : AppCompatActivity() {
         Log.e("20241", "Нету интернета")
     }
 
-    private fun loadData() {
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(0)
+    private suspend fun loadData() {
+        delay(1800)
+        withContext(Dispatchers.Main) {
             if (phoneNum != null) {
                 goToHome()
             } else {
@@ -90,7 +101,6 @@ class splashscreen : AppCompatActivity() {
     }
 
     private fun goToHome() {
-        Log.d("20241", "Переходим к домашнему экра")
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         overridePendingTransition(R.anim.fade_in, R.anim.fade_out)

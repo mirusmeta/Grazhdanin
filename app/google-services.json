@@ -8,66 +8,9 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:928394966839:android:427cc757119b93d9c84cb2",
+        "mobilesdk_app_id": "1:928394966839:android:6a7acfa8d02ab51bc84cb2",
         "android_client_info": {
-          "package_name": "com.example.family"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNmfx9zv7Yd7DTcz4JnF6_OU3EjsIU5MA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:928394966839:android:e3ffc05193d4f45ec84cb2",
-        "android_client_info": {
-          "package_name": "com.example.responsiblecitizen"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNmfx9zv7Yd7DTcz4JnF6_OU3EjsIU5MA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:928394966839:android:e4618233f8e5233cc84cb2",
-        "android_client_info": {
-          "package_name": "ru.mirusmeta"
-        }
-      },
-      "oauth_client": [],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCNmfx9zv7Yd7DTcz4JnF6_OU3EjsIU5MA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": []
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:928394966839:android:0a11960fdac5a187c84cb2",
-        "android_client_info": {
-          "package_name": "ru.southcode"
+          "package_name": "ru.mirus.donsol"
         }
       },
       "oauth_client": [],

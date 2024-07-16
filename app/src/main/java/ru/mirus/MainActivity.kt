@@ -1,10 +1,10 @@
-package ru.mirusmeta
+package ru.mirus
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.content.Intent
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
@@ -19,7 +19,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -91,6 +90,7 @@ class MainActivity : AppCompatActivity() {
     private val bottom_navigation by lazy { findViewById<BottomNavigationView>(R.id.bottom_navigation) }
     private val chip1 by lazy { findViewById<Chip>(R.id.chip1) }
     private val chip2 by lazy { findViewById<Chip>(R.id.chip2) }
+    private var currentPage: Int = R.id.item_1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -228,32 +228,33 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun runBottomMenu() {
-        bottom_navigation?.setOnItemSelectedListener {item ->
-            when(item.itemId) {
+        bottom_navigation?.setOnItemSelectedListener { item ->
+            val previousPage = currentPage
+            currentPage = item.itemId
+            val direction = currentPage > previousPage
+
+            when (item.itemId) {
                 R.id.item_1 -> {
-                    homepage?.visibility = View.VISIBLE
-                    mappage?.visibility = View.INVISIBLE
-                    profilepage?.visibility = View.INVISIBLE
+                    switchView(homepage, mappage, profilepage, direction)
                     textviewall?.text = "Все обращения"
                     true
                 }
                 R.id.item_3 -> {
-                    homepage?.visibility = View.INVISIBLE
-                    mappage?.visibility = View.VISIBLE
-                    profilepage?.visibility = View.INVISIBLE
+                    switchView(mappage, homepage, profilepage, direction)
                     textviewall?.text = "Карта"
                     true
                 }
                 R.id.item_4 -> {
-                    homepage?.visibility = View.INVISIBLE
-                    mappage?.visibility = View.INVISIBLE
-                    profilepage?.visibility = View.VISIBLE
+                    switchView(profilepage, homepage, mappage, direction)
                     textviewall?.text = "Профиль"
                     true
                 }
                 else -> false
             }
         }
+
+
+
         chip1?.setOnClickListener {
             if(chip2?.isChecked == true){
                 firebaseupdate()
@@ -363,55 +364,56 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { result ->
                     val reportsList = mutableListOf<CustomModel>()
                     for (document in result) {
-                        val lat = document.getDouble("wherelat")!!
-                        val lon = document.getDouble("wherelon")!!
-                        val name = document.getString("name").toString()
-                        var ratesOfAll: Double? = 0.0
-                        var kolvoAll:Int? = 0
+                        if(document.getString("availbe").toString() == "true"){
+                            val lat = document.getDouble("wherelat")!!
+                            val lon = document.getDouble("wherelon")!!
+                            val name = document.getString("name").toString()
+                            var ratesOfAll: Double? = 0.0
+                            var kolvoAll:Int? = 0
 
-                        document.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
-                            val parts = pair.split(":")
-                            val phone = "+${parts[0]}"
-                            val rate = parts[1].toInt()
-                            ratesOfAll = ratesOfAll!! + rate
-                            kolvoAll = kolvoAll!! + 1
-                            phone to rate
-                        }
-                        var report:CustomModel
-                        if(kolvoAll != 0){
-                            report = CustomModel(
-                                document.id.toString(),
-                                document.getString("name").toString(),
-                                "Место: ${document.getString("city").toString()}",
-                                "images/${document.getString("image").toString()}",
-                                document.id.toString(),
-                                ((ratesOfAll!! / kolvoAll!!).toDouble())
-                            )
-                        }
-                        else{
-                            report = CustomModel(
-                                document.id.toString(),
-                                document.getString("name").toString(),
-                                "Место: ${document.getString("city").toString()}",
-                                "images/${document.getString("image").toString()}",
-                                document.id.toString(),
-                                0.0
-                            )
-                        }
-                        reportsList.add(report)
-                        mapFragment.getMapAsync {map ->
-                            when(document.getString("status").toString()){
-                                "created" -> map.addMarker(MarkerOptions().icon(
-                                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
-                                "viewed" -> map.addMarker(MarkerOptions().icon(
-                                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
-                                "incomplete" -> map.addMarker(MarkerOptions().icon(
-                                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
-                                "completed" -> map.addMarker(MarkerOptions().icon(
-                                    BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
+                            document.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                                val parts = pair.split(":")
+                                val phone = "+${parts[0]}"
+                                val rate = parts[1].toInt()
+                                ratesOfAll = ratesOfAll!! + rate
+                                kolvoAll = kolvoAll!! + 1
+                                phone to rate
+                            }
+                            var report:CustomModel
+                            if(kolvoAll != 0){
+                                report = CustomModel(
+                                    document.id.toString(),
+                                    document.getString("name").toString(),
+                                    "Место: ${document.getString("city").toString()}",
+                                    "images/${document.getString("image").toString()}",
+                                    document.id.toString(),
+                                    ((ratesOfAll!! / kolvoAll!!).toDouble())
+                                )
+                            }
+                            else{
+                                report = CustomModel(
+                                    document.id.toString(),
+                                    document.getString("name").toString(),
+                                    "Место: ${document.getString("city").toString()}",
+                                    "images/${document.getString("image").toString()}",
+                                    document.id.toString(),
+                                    0.0
+                                )
+                            }
+                            reportsList.add(report)
+                            mapFragment.getMapAsync {map ->
+                                when(document.getString("status").toString()){
+                                    "created" -> map.addMarker(MarkerOptions().icon(
+                                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
+                                    "viewed" -> map.addMarker(MarkerOptions().icon(
+                                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
+                                    "incomplete" -> map.addMarker(MarkerOptions().icon(
+                                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
+                                    "completed" -> map.addMarker(MarkerOptions().icon(
+                                        BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)).title(name).position(LatLng(lat, lon)).snippet(document.id.toString()))
+                                }
                             }
                         }
-
                     }
                     reportsList.sortBy { it.raiting }
                     reportsList.reverse()
@@ -451,6 +453,43 @@ class MainActivity : AppCompatActivity() {
             .show()
 
     }
+    private fun switchView(toShow: ConstraintLayout, toHide1: ConstraintLayout, toHide2: ConstraintLayout, direction: Boolean) {
+
+        val duration2 = 300L
+        val slideDirection = if (direction) 1f else -1f
+
+        // Анимация исчезновения и сдвига для скрываемых вью
+        val fadeOut1 = ObjectAnimator.ofFloat(toHide1, "alpha", 1f, 0f).apply { duration = duration2 }
+        val fadeOut2 = ObjectAnimator.ofFloat(toHide2, "alpha", 1f, 0f).apply { duration = duration2 }
+        val slideOut1 = ObjectAnimator.ofFloat(toHide1, "translationX", 0f, -toHide1.width.toFloat() * slideDirection).apply { duration = duration2 }
+        val slideOut2 = ObjectAnimator.ofFloat(toHide2, "translationX", 0f, -toHide2.width.toFloat() * slideDirection).apply { duration = duration2 }
+
+        // Анимация появления и сдвига для показываемого вью
+        toShow.alpha = 0f
+        toShow.translationX = toShow.width.toFloat() * slideDirection
+        val fadeIn = ObjectAnimator.ofFloat(toShow, "alpha", 0f, 1f).apply { duration = duration2 }
+        val slideIn = ObjectAnimator.ofFloat(toShow, "translationX", toShow.width.toFloat() * slideDirection, 0f).apply { duration = duration2 }
+
+        val hideSet = AnimatorSet().apply {
+            playTogether(fadeOut1, fadeOut2, slideOut1, slideOut2)
+        }
+        val showSet = AnimatorSet().apply {
+            playTogether(fadeIn, slideIn)
+        }
+        AnimatorSet().apply {
+            playSequentially(hideSet, showSet)
+            start()
+        }
+
+        hideSet.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                toHide1.visibility = View.INVISIBLE
+                toHide2.visibility = View.INVISIBLE
+                toShow.visibility = View.VISIBLE
+            }
+        })
+    }
+
 
     override fun onBackPressed() {
 

@@ -5,15 +5,15 @@ plugins {
 }
 
 android {
-    namespace = "ru.mirusmeta"
+    namespace = "ru.mirus"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "ru.mirusmeta"
+        applicationId = "ru.mirus.donsol"
         minSdk = 25
         targetSdk = 33
         versionCode = 1
-        versionName = "1.1.2-beta"
+        versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -51,7 +51,7 @@ android {
 
 dependencies {
     implementation("com.vk.id:onetap-xml:2.0.0")
-
+    implementation("androidx.transition:transition:1.4.1")
     implementation("com.vk.id:vkid:2.0.0")
     implementation("com.github.bumptech.glide:glide:4.12.0")
     implementation("com.squareup.picasso:picasso:2.71828")
@@ -66,7 +66,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.3")
 
 }

@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.app.AlarmManager
 import android.app.PendingIntent

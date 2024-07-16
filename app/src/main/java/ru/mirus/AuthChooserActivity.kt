@@ -1,25 +1,12 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.CheckBox
-import android.widget.ProgressBar
-import android.widget.TextView
-import android.widget.Toast
-import androidx.constraintlayout.widget.ConstraintLayout
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.Firebase
-import com.google.firebase.firestore.firestore
-import com.vk.id.AccessToken
 import com.vk.id.VKID
 import com.vk.id.VKIDAuthFail
-import com.vk.id.auth.VKIDAuthCallback
 import com.vk.id.onetap.xml.OneTap
 
 class AuthChooserActivity : AppCompatActivity() {

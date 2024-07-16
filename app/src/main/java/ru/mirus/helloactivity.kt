@@ -1,6 +1,5 @@
-package ru.mirusmeta
+package ru.mirus
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -29,7 +28,7 @@ class helloactivity : AppCompatActivity() {
         spannableHelloName
     }
     private val spannableCompanyName by lazy {
-        val spannableCompanyName = SpannableString("By, Vometix")
+        val spannableCompanyName = SpannableString("By, Mirus")
         spannableCompanyName.setSpan(ForegroundColorSpan(ContextCompat.getColor(this, R.color.purple_200)), 4, spannableCompanyName.length, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
         spannableCompanyName
     }

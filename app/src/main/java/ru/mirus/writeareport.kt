@@ -1,6 +1,5 @@
-package ru.mirusmeta
+package ru.mirus
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
@@ -31,9 +30,6 @@ import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
 import com.squareup.picasso.Picasso
 import com.vk.id.VKID
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 
@@ -129,7 +125,7 @@ class writeareport : AppCompatActivity() {
                     "deskription" to deskriptiontext.text.toString(),
                     "views" to 0,
                     "status" to "created",
-                    "availbe" to "true",
+                    "availbe" to "false",
                     "city" to ADRESS,
                     "from" to "+${VKID.instance.accessToken?.userData?.phone.toString()}",
                     "liked" to 0.0,

@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.graphics.Bitmap
 import android.graphics.BitmapShader

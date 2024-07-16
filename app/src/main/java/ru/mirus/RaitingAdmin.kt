@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import com.squareup.picasso.Target
 import android.graphics.Bitmap

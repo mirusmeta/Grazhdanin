@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.annotation.SuppressLint
 import android.content.Context

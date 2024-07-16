@@ -1,4 +1,4 @@
-package ru.mirusmeta
+package ru.mirus
 
 import android.content.Context
 import android.content.Intent
