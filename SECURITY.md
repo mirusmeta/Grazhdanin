@@ -1,21 +1,11 @@
 # Security Policy
 
-## Supported Versions
+## Поддерживаемые версии
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Сдесь отображены версии, которые работают стабильно и безопасно шифруют ваши данные
 
-| Version | Supported          |
+| Версии | Поддерживается          |
 | ------- | ------------------ |
 | 1.0.x   | :white_check_mark: |
 | 0.9.x   | :x:                |
-| 0.8.x   | :white_check_mark: |
-| < 0.8.1   | :x:                |
 
-## Reporting a Vulnerability
-
-Use this section to tell people how to report a vulnerability.
-
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
