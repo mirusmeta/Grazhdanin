@@ -129,7 +129,7 @@
         android:text="Отправить форму"
         android:textAllCaps="false"
         android:layout_marginBottom="40dp"
-        android:textColor="#2C2C2C"
+        android:textColor="@color/white"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -154,7 +154,7 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:enabled="false"
-            android:background="@drawable/styleofbuttonsignin"
+            android:background="@drawable/knopkaotpravit"
             android:layout_marginBottom="40dp"
             android:id="@+id/buttonchoose"
             android:layout_width="wrap_content"

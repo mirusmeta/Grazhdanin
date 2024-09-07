@@ -1,5 +1,6 @@
 package ru.mirus
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
@@ -25,6 +26,10 @@ class splashscreen : AppCompatActivity() {
     private val phoneNum by lazy {
         VKID.instance.accessToken?.userData?.phone
     }
+    private val imgLogo by lazy{
+        findViewById<ImageView>(R.id.img)
+        
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,14 +40,12 @@ class splashscreen : AppCompatActivity() {
         textView = findViewById(R.id.textView)
         btn = findViewById(R.id.btn)
 
-        val imgLogo = findViewById<ImageView>(R.id.img)
         val slideDownAnimation = AnimationUtils.loadAnimation(this, R.anim.slide_down)
         imgLogo.startAnimation(slideDownAnimation)
 
         slideDownAnimation.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {}
             override fun onAnimationRepeat(animation: Animation?) {}
-
             override fun onAnimationEnd(animation: Animation?) {
                 val swingAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.swing)
                 imgLogo.startAnimation(swingAnimation)
@@ -69,6 +72,7 @@ class splashscreen : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("ObsoleteSdkInt")
     private fun isNetworkAvailable(): Boolean {
         val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {

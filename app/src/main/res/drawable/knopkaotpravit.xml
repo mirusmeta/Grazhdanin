@@ -11,7 +11,7 @@
     <item android:state_enabled="true">
         <shape android:shape="rectangle">
             <corners android:radius="18dp" />
-            <solid android:color="#7AC4FF" /> <!-- Цвет для включенного состояния -->
+            <solid android:color="@color/btn" /> <!-- Цвет для включенного состояния -->
         </shape>
     </item>
 </selector>

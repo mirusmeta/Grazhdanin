@@ -4,6 +4,7 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -227,6 +228,7 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    @SuppressLint("ResourceAsColor")
     private fun runBottomMenu() {
         bottom_navigation?.setOnItemSelectedListener { item ->
             val previousPage = currentPage
@@ -235,18 +237,24 @@ class MainActivity : AppCompatActivity() {
 
             when (item.itemId) {
                 R.id.item_1 -> {
-                    switchView(homepage, mappage, profilepage, direction)
-                    textviewall?.text = "Все обращения"
+                    if(previousPage != R.id.item_1){
+                        switchView(homepage, mappage, profilepage, direction)
+                        textviewall?.text = "Все обращения"
+                    }
                     true
                 }
                 R.id.item_3 -> {
-                    switchView(mappage, homepage, profilepage, direction)
-                    textviewall?.text = "Карта"
+                    if(previousPage != R.id.item_3){
+                        switchView(mappage, homepage, profilepage, direction)
+                        textviewall?.text = "Карта"
+                    }
                     true
                 }
                 R.id.item_4 -> {
-                    switchView(profilepage, homepage, mappage, direction)
-                    textviewall?.text = "Профиль"
+                    if(previousPage != R.id.item_4){
+                        switchView(profilepage, homepage, mappage, direction)
+                        textviewall?.text = "Профиль"
+                    }
                     true
                 }
                 else -> false
@@ -297,11 +305,11 @@ class MainActivity : AppCompatActivity() {
             reportsCollection.get()
                 .addOnSuccessListener { result ->
                     val reportsList = mutableListOf<CustomModel>()
-                    for (document in result) {
-                        if(document.getString("from").toString() == phoneOfUserWithoutText){
+                    result.forEach {
+                        if(it.getString("from").toString() == phoneOfUserWithoutText){
                             var ratesOfAll: Double? = 0.0
                             var kolvoAll:Int? = 0
-                            document.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
+                            it.getString("marksofall")?.split("+")?.filter { it.isNotEmpty() }?.map{ pair ->
                                 val parts = pair.split(":")
                                 val phone = "+${parts[0]}"
                                 val rate = parts[1].toInt()
@@ -312,21 +320,21 @@ class MainActivity : AppCompatActivity() {
                             var report:CustomModel
                             if(kolvoAll != 0){
                                 report = CustomModel(
-                                    document.id.toString(),
-                                    document.getString("name").toString(),
-                                    "Место: ${document.getString("city").toString()}",
-                                    "images/${document.getString("image").toString()}",
-                                    document.id.toString(),
+                                    it.id.toString(),
+                                    it.getString("name").toString(),
+                                    "Место: ${it.getString("city").toString()}",
+                                    "images/${it.getString("image").toString()}",
+                                    it.id.toString(),
                                     ((ratesOfAll!! / kolvoAll!!).toDouble())
                                 )
                             }
                             else{
                                 report = CustomModel(
-                                    document.id.toString(),
-                                    document.getString("name").toString(),
-                                    "Место: ${document.getString("city").toString()}",
-                                    "images/${document.getString("image").toString()}",
-                                    document.id.toString(),
+                                    it.id.toString(),
+                                    it.getString("name").toString(),
+                                    "Место: ${it.getString("city").toString()}",
+                                    "images/${it.getString("image").toString()}",
+                                    it.id.toString(),
                                     0.0
                                 )
                             }
@@ -495,69 +503,7 @@ class MainActivity : AppCompatActivity() {
 
     }
     private fun drawRostovRegion() {
-        val rostovRegion = listOf<LatLng>(
-            LatLng(47.13553438153998, 38.302159754585915),
-            LatLng(47.626788207924484, 38.64693558667729),
-            LatLng(47.675911216330555, 38.80838119541676),
-            LatLng(47.853823989308516, 38.85773830894567),
-            LatLng(47.79720543788483, 39.40033506176705),
-            LatLng(47.81452227287008, 39.79169321577317),
-            LatLng(48.18520152855693, 39.97987807258965),
-            LatLng(48.21946905252555, 40.038922458828104),
-            LatLng(48.289650340935864, 40.0459086869659),
-            LatLng(48.67300343460887, 39.789073897806524),
-            LatLng(48.77721645231985, 39.82783429183503),
-            LatLng(48.76882571532184, 39.97266899791961),
-            LatLng(48.883900976613795, 40.123992888804835),
-            LatLng(49.253777986370096, 40.23531760760152),
-            LatLng(49.564021247056, 40.21442250901585),
-            LatLng(49.56885566582923, 40.574328942551844),
-            LatLng(49.74923801943919, 41.16787498856184),
-            LatLng(49.9478953871737, 41.16862299955497),
-            LatLng(49.947614542807464, 41.61126687641212),
-            LatLng(49.845554967224196, 41.854097405504426),
-            LatLng(49.712596931748806, 42.022740347161466),
-            LatLng(49.15161112253979, 41.91021742245316),
-            LatLng(49.06248116402108, 41.946237160773904),
-            LatLng(48.92420327864517, 42.57674572739463),
-            LatLng(48.615251873706754, 42.589174770177266),
-            LatLng(48.47521088274825, 41.998314695739275),
-            LatLng(47.982790168506185, 41.964676887794),
-            LatLng(47.885120069239555, 42.633608424215694),
-            LatLng(47.48306808302766, 42.89760324147796),
-            LatLng(47.394984901896194, 43.71681273272154),
-            LatLng(47.260345326781604, 43.71428007495698),
-            LatLng(47.2206928027828, 44.26371405508802),
-            LatLng(46.99551484987049, 44.23361754312208),
-            LatLng(46.558413149567954, 43.698461751213095),
-            LatLng(46.46248141256627, 43.793346409837945),
-            LatLng(46.438426217117176, 43.67734897004885),
-            LatLng(46.20694368078315, 43.581340114945974),
-            LatLng(46.20373210727938, 43.33606353975711),
-            LatLng(46.47999999656177, 42.95666023687134),
-            LatLng(46.59330066498818, 41.98044679807991),
-            LatLng(46.333882318463274, 42.03822007877765),
-            LatLng(46.33826166455486, 41.875041668847196),
-            LatLng(46.199248220221605, 41.87421112831077),
-            LatLng(46.259662160932315, 41.653413320106544),
-            LatLng(46.03370979063651, 41.148167764047926),
-            LatLng(46.33748558498134, 40.99921390998942),
-            LatLng(46.33232932001834, 40.340600539189154),
-            LatLng(46.78066488228873, 40.179610006290446),
-            LatLng(46.82840841512607, 40.0971873534906),
-            LatLng(46.83973494033634, 39.219058728855856),
-            LatLng(46.742390240317526, 39.19499358639279),
-            LatLng(46.645520546589125, 39.18348875240232),
-            LatLng(46.68050905663721, 38.904560052267286),
-            LatLng(46.816254818357976, 38.915757606509516),
-            LatLng(46.83556222490131, 38.95693800158574),
-            LatLng(46.86858575192827, 38.94707115712585),
-            LatLng(46.85501743658072, 38.847996661108674),
-            LatLng(46.83334689396991, 38.860288645573334),
-            LatLng(46.831931848238426, 38.6897452908099),
-            LatLng(46.87883828720678, 38.68945077735905),
-            LatLng(47.11920264845045, 38.230287189210635),
-        )
+        val rostovRegion = listOf<LatLng>(LatLng(47.13553438153998, 38.302159754585915), LatLng(47.626788207924484, 38.64693558667729), LatLng(47.675911216330555, 38.80838119541676), LatLng(47.853823989308516, 38.85773830894567), LatLng(47.79720543788483, 39.40033506176705), LatLng(47.81452227287008, 39.79169321577317), LatLng(48.18520152855693, 39.97987807258965), LatLng(48.21946905252555, 40.038922458828104), LatLng(48.289650340935864, 40.0459086869659), LatLng(48.67300343460887, 39.789073897806524), LatLng(48.77721645231985, 39.82783429183503), LatLng(48.76882571532184, 39.97266899791961), LatLng(48.883900976613795, 40.123992888804835), LatLng(49.253777986370096, 40.23531760760152), LatLng(49.564021247056, 40.21442250901585), LatLng(49.56885566582923, 40.574328942551844), LatLng(49.74923801943919, 41.16787498856184), LatLng(49.9478953871737, 41.16862299955497), LatLng(49.947614542807464, 41.61126687641212), LatLng(49.845554967224196, 41.854097405504426), LatLng(49.712596931748806, 42.022740347161466), LatLng(49.15161112253979, 41.91021742245316), LatLng(49.06248116402108, 41.946237160773904), LatLng(48.92420327864517, 42.57674572739463), LatLng(48.615251873706754, 42.589174770177266), LatLng(48.47521088274825, 41.998314695739275), LatLng(47.982790168506185, 41.964676887794), LatLng(47.885120069239555, 42.633608424215694), LatLng(47.48306808302766, 42.89760324147796), LatLng(47.394984901896194, 43.71681273272154), LatLng(47.260345326781604, 43.71428007495698), LatLng(47.2206928027828, 44.26371405508802), LatLng(46.99551484987049, 44.23361754312208), LatLng(46.558413149567954, 43.698461751213095), LatLng(46.46248141256627, 43.793346409837945), LatLng(46.438426217117176, 43.67734897004885), LatLng(46.20694368078315, 43.581340114945974), LatLng(46.20373210727938, 43.33606353975711), LatLng(46.47999999656177, 42.95666023687134), LatLng(46.59330066498818, 41.98044679807991), LatLng(46.333882318463274, 42.03822007877765), LatLng(46.33826166455486, 41.875041668847196), LatLng(46.199248220221605, 41.87421112831077), LatLng(46.259662160932315, 41.653413320106544), LatLng(46.03370979063651, 41.148167764047926), LatLng(46.33748558498134, 40.99921390998942), LatLng(46.33232932001834, 40.340600539189154), LatLng(46.78066488228873, 40.179610006290446), LatLng(46.82840841512607, 40.0971873534906), LatLng(46.83973494033634, 39.219058728855856), LatLng(46.742390240317526, 39.19499358639279), LatLng(46.645520546589125, 39.18348875240232), LatLng(46.68050905663721, 38.904560052267286), LatLng(46.816254818357976, 38.915757606509516), LatLng(46.83556222490131, 38.95693800158574), LatLng(46.86858575192827, 38.94707115712585), LatLng(46.85501743658072, 38.847996661108674), LatLng(46.83334689396991, 38.860288645573334), LatLng(46.831931848238426, 38.6897452908099), LatLng(46.87883828720678, 38.68945077735905), LatLng(47.11920264845045, 38.230287189210635))
         val polygonOptions = PolygonOptions()
             .addAll(rostovRegion)
             .strokeColor(resources.getColor(R.color.purple_200))
@@ -566,7 +512,7 @@ class MainActivity : AppCompatActivity() {
         polygon = rostovRegion
         mMap.clear()
     }
-    fun isPointInsidePolygon(point: LatLng, polygon: List<LatLng>): Boolean {
+    private fun isPointInsidePolygon(point: LatLng, polygon: List<LatLng>): Boolean {
         var isInside = false
         val polySize = polygon.size
         var j = polySize - 1

@@ -4,7 +4,7 @@
     <item >
         <shape android:shape="rectangle">
             <corners android:radius="16dp" />
-            <solid android:color="#7DCEFF" /> <!-- Цвет для включенного состояния -->
+            <solid android:color="@color/purple_500" /> <!-- Цвет для включенного состояния -->
         </shape>
     </item>
 </selector>

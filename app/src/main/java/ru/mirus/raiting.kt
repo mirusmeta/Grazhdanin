@@ -13,6 +13,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import com.google.firebase.storage.FirebaseStorage
@@ -73,7 +74,7 @@ class raiting : AppCompatActivity() {
             val storage = FirebaseStorage.getInstance()
             val storageRef = storage.reference.child("images/${it.getString("image")}")
             storageRef.downloadUrl.addOnSuccessListener { uri ->
-                Picasso.get().load(uri).transform(RoundedCornersTransformation(34f)).into(myImageForLoading)
+                Picasso.get().load(uri).transform(RoundedCornersTransformation(60f)).into(myImageForLoading)
             }
 
             stringOfAll = it.getString("marksofall")
@@ -91,7 +92,7 @@ class raiting : AppCompatActivity() {
                 phone to rate
             }
             if(kolvoAll != 0){
-                likes.text = (ratesOfAll!! / kolvoAll!!).toString()
+                likes.text = (ratesOfAll!! / kolvoAll!!).toString().substring(0,3)
                 views.text = kolvoAll.toString()
             }else{
                 likes.text = "0"
@@ -149,9 +150,11 @@ class raiting : AppCompatActivity() {
                 stringOfAll += "$phoneOfUserWithoutText:${ratingBar.rating.toInt()}"
                 db.collection("reports").document(id.toString()).update(mapOf("marksofall" to stringOfAll)).addOnSuccessListener {
                     finish()
+                }.addOnFailureListener {
+                    Snackbar.make(findViewById(R.id.backg), "Ошибка, попробуйте позже", Snackbar.LENGTH_LONG).show()
+                    finish()
                 }
             }
-
         }
     }
 }

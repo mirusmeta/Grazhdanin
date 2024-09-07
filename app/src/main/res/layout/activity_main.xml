@@ -43,7 +43,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:id="@+id/chipset"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="64dp"
             android:layout_marginStart="20dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -75,7 +75,7 @@
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
             android:layout_height="match_parent"
-            android:layout_marginTop="110dp"
+            android:layout_marginTop="120dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -244,13 +244,20 @@
         app:layout_constraintBottom_toTopOf="@id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
+        <ImageView
+            android:layout_marginTop="26dp"
+            android:layout_marginEnd="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/logo"
+            android:layout_width="40dp"
+            android:layout_height="40dp"/>
         <TextView
             android:id="@+id/pd"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Персональные данные"
-            android:textColor="@color/purple_200"
+            android:textColor="#292929"
             android:textSize="17dp"
             android:layout_marginTop="100dp"
             android:layout_marginStart="32dp"
@@ -413,6 +420,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Обращения"
+            android:textColor="@color/a_bit_gray"
             android:textSize="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />

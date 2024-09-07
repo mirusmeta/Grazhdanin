@@ -14,4 +14,6 @@
     <color name="btnligght">#76B6E8</color>
     <color name="poisk">#C9E7FF</color>
     <color name="gray">#646464</color>
+    <color name="blue_text">#006BC7</color>
+    <color name="a_bit_gray">#0F0F0F</color>
 </resources>
